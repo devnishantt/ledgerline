@@ -1,0 +1,4 @@
+ALTER TABLE runs ADD COLUMN ambiguity_count INTEGER NOT NULL DEFAULT 0;
+CREATE TABLE run_revision_claims (workspace_id TEXT NOT NULL, run_id TEXT NOT NULL, revision INTEGER NOT NULL, PRIMARY KEY(workspace_id,run_id,revision), FOREIGN KEY(workspace_id,run_id) REFERENCES runs(workspace_id,id));
+CREATE TABLE approved_allocations (workspace_id TEXT NOT NULL, transaction_id TEXT NOT NULL, run_id TEXT NOT NULL, match_id TEXT NOT NULL REFERENCES matches(id), PRIMARY KEY(workspace_id,transaction_id), FOREIGN KEY(workspace_id,transaction_id) REFERENCES transactions(workspace_id,id));
+CREATE TRIGGER transaction_account_capacity BEFORE INSERT ON transactions WHEN (SELECT COUNT(*) FROM transactions WHERE workspace_id=NEW.workspace_id AND account_id=NEW.account_id)>=400 BEGIN SELECT RAISE(ABORT,'account capacity reached'); END;
