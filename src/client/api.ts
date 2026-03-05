@@ -1,4 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
+import { z } from 'zod'
+const errorEnvelope=z.object({error:z.object({code:z.string(),message:z.string()})})
 import type { Match,Run,Transaction,Rule } from '../domain/types'
 let credential=''
 export const setCredential=(key:string)=>{credential=key}
@@ -7,14 +9,14 @@ export async function request<T=any>(path:string,options:RequestInit={},override
   const response=await fetch('/api'+path,{...options,headers:{Authorization:'Bearer '+(override??credential),...(options.body?{'Content-Type':'application/json'}:{}),...options.headers}})
   if(response.status===204) return undefined as T
   const content=await response.json()
-  if(!response.ok) throw new ApiError(response.status,content.error?.code??'REQUEST_FAILED',content.error?.message??'Request failed')
+  if(!response.ok) {const parsed=errorEnvelope.safeParse(content);throw new ApiError(response.status,parsed.success?parsed.data.error.code:'REQUEST_FAILED',parsed.success?parsed.data.error.message:'Request failed')}
   return content as T
 }
 export const post=<T=any>(path:string,data:unknown)=>request<T>(path,{method:'POST',body:JSON.stringify(data)})
 export const useApi=<T=any>(path:string)=>useQuery<T>({queryKey:[path],queryFn:()=>request<T>(path),retry:false})
 export async function download(path:string,filename:string) {
   const response=await fetch('/api'+path,{headers:{Authorization:'Bearer '+credential}})
-  if(!response.ok){const error=await response.json();throw new Error(error.error?.message??'Export failed')}
+  if(!response.ok){const parsed=errorEnvelope.safeParse(await response.json());throw new Error(parsed.success?parsed.data.error.message:'Export failed')}
   const url=URL.createObjectURL(await response.blob()),a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)
 }
 export type Account={id:string;name:string;currency:string;institution:string;created_at:string}
