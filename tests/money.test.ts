@@ -8,3 +8,7 @@ test("preserve hundredths without binary float rounding", async()=>{
 test("parse signed expenses exactly", async()=>{
   expect(toMinor('-84.50','USD')).toBe(-8450);expect(decimal(-8450,'USD')).toBe('-84.50')
 })
+
+test("pad a single decimal digit", async()=>{
+  expect(toMinor('12.3','EUR')).toBe(1230);expect(decimal(1230,'EUR')).toBe('12.30')
+})
