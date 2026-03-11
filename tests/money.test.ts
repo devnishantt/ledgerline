@@ -12,3 +12,7 @@ test("parse signed expenses exactly", async()=>{
 test("pad a single decimal digit", async()=>{
   expect(toMinor('12.3','EUR')).toBe(1230);expect(decimal(1230,'EUR')).toBe('12.30')
 })
+
+test("support integer yen without scaling", async()=>{
+  expect(toMinor('900','JPY')).toBe(900);expect(decimal(900,'JPY')).toBe('900')
+})
