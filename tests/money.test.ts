@@ -16,3 +16,7 @@ test("pad a single decimal digit", async()=>{
 test("support integer yen without scaling", async()=>{
   expect(toMinor('900','JPY')).toBe(900);expect(decimal(900,'JPY')).toBe('900')
 })
+
+test("reject fractional yen", async()=>{
+  expect(()=>toMinor('1.1','JPY')).toThrow('decimal places')
+})
