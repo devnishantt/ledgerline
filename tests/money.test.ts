@@ -20,3 +20,7 @@ test("support integer yen without scaling", async()=>{
 test("reject fractional yen", async()=>{
   expect(()=>toMinor('1.1','JPY')).toThrow('decimal places')
 })
+
+test("reject precision beyond currency exponent", async()=>{
+  expect(()=>toMinor('1.001','USD')).toThrow('decimal places')
+})
