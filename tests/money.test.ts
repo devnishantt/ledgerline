@@ -24,3 +24,7 @@ test("reject fractional yen", async()=>{
 test("reject precision beyond currency exponent", async()=>{
   expect(()=>toMinor('1.001','USD')).toThrow('decimal places')
 })
+
+test("reject scientific notation", async()=>{
+  expect(()=>toMinor('1e3','USD')).toThrow('plain decimal')
+})
