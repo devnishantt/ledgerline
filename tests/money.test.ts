@@ -28,3 +28,7 @@ test("reject precision beyond currency exponent", async()=>{
 test("reject scientific notation", async()=>{
   expect(()=>toMinor('1e3','USD')).toThrow('plain decimal')
 })
+
+test("reject locale thousands separators", async()=>{
+  expect(()=>toMinor('1,200.00','USD')).toThrow('plain decimal')
+})
