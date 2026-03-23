@@ -32,3 +32,7 @@ test("reject scientific notation", async()=>{
 test("reject locale thousands separators", async()=>{
   expect(()=>toMinor('1,200.00','USD')).toThrow('plain decimal')
 })
+
+test("reject currency symbols in numeric cells", async()=>{
+  expect(()=>toMinor('$12.00','USD')).toThrow('plain decimal')
+})
