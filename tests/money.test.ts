@@ -36,3 +36,7 @@ test("reject locale thousands separators", async()=>{
 test("reject currency symbols in numeric cells", async()=>{
   expect(()=>toMinor('$12.00','USD')).toThrow('plain decimal')
 })
+
+test("normalize surrounding whitespace and leading zeros", async()=>{
+  expect(toMinor(' 00012.50 ','GBP')).toBe(1250)
+})
