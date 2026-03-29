@@ -40,3 +40,7 @@ test("reject currency symbols in numeric cells", async()=>{
 test("normalize surrounding whitespace and leading zeros", async()=>{
   expect(toMinor(' 00012.50 ','GBP')).toBe(1250)
 })
+
+test("normalize negative zero", async()=>{
+  expect(Object.is(toMinor('-0.00','USD'),-0)).toBe(false)
+})
