@@ -48,3 +48,7 @@ test("normalize negative zero", async()=>{
 test("reject values beyond the supported accounting limit", async()=>{
   expect(()=>toMinor('90000000000.01','USD')).toThrow('limit')
 })
+
+test("accept the exact supported monetary boundary", async()=>{
+  expect(toMinor('90000000000.00','USD')).toBe(9000000000000)
+})
