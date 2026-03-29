@@ -52,3 +52,7 @@ test("reject values beyond the supported accounting limit", async()=>{
 test("accept the exact supported monetary boundary", async()=>{
   expect(toMinor('90000000000.00','USD')).toBe(9000000000000)
 })
+
+test("reject unsafe integer serialization", async()=>{
+  expect(()=>decimal(Number.MAX_SAFE_INTEGER+1,'USD')).toThrow('safe integer')
+})
