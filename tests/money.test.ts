@@ -44,3 +44,7 @@ test("normalize surrounding whitespace and leading zeros", async()=>{
 test("normalize negative zero", async()=>{
   expect(Object.is(toMinor('-0.00','USD'),-0)).toBe(false)
 })
+
+test("reject values beyond the supported accounting limit", async()=>{
+  expect(()=>toMinor('90000000000.01','USD')).toThrow('limit')
+})
