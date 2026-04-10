@@ -60,3 +60,7 @@ test("reject unsafe integer serialization", async()=>{
 test("reject unsupported currency codes", async()=>{
   expect(()=>exponent('BTC')).toThrow('Unsupported');expect(()=>formatMoney(100,'BTC')).toThrow()
 })
+
+test("format positive and negative display amounts", async()=>{
+  expect(formatMoney(1250,'USD')).toBe('$12.50');expect(formatMoney(-1250,'USD')).toBe('-$12.50')
+})
