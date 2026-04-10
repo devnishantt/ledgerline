@@ -56,3 +56,7 @@ test("accept the exact supported monetary boundary", async()=>{
 test("reject unsafe integer serialization", async()=>{
   expect(()=>decimal(Number.MAX_SAFE_INTEGER+1,'USD')).toThrow('safe integer')
 })
+
+test("reject unsupported currency codes", async()=>{
+  expect(()=>exponent('BTC')).toThrow('Unsupported');expect(()=>formatMoney(100,'BTC')).toThrow()
+})
