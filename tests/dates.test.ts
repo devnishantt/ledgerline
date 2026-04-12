@@ -8,3 +8,7 @@ test("accept leap days only in leap years", async()=>{
 test("reject overflow days rather than normalizing them", async()=>{
   expect(validDate('2026-04-31')).toBe(false);expect(validDate('2026-04-30')).toBe(true)
 })
+
+test("require padded ISO calendar dates", async()=>{
+  expect(validDate('2026-1-01')).toBe(false);expect(validDate('01/01/2026')).toBe(false)
+})
