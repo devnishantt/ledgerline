@@ -20,3 +20,7 @@ test("reject timestamps where dates are required", async()=>{
 test("count date windows symmetrically in UTC", async()=>{
   expect(daysBetween('2026-01-01','2026-01-04')).toBe(3);expect(daysBetween('2026-01-04','2026-01-01')).toBe(3)
 })
+
+test("cross month and year boundaries exactly", async()=>{
+  expect(daysBetween('2025-12-31','2026-01-01')).toBe(1);expect(daysBetween('2026-01-31','2026-02-01')).toBe(1)
+})
