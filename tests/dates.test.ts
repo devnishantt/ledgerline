@@ -24,3 +24,7 @@ test("count date windows symmetrically in UTC", async()=>{
 test("cross month and year boundaries exactly", async()=>{
   expect(daysBetween('2025-12-31','2026-01-01')).toBe(1);expect(daysBetween('2026-01-31','2026-02-01')).toBe(1)
 })
+
+test("reject invalid dates in date arithmetic", async()=>{
+  expect(()=>daysBetween('not-a-date','2026-01-01')).toThrow('Invalid');expect(()=>monthOf('2026-13-01')).toThrow()
+})
