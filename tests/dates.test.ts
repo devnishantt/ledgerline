@@ -16,3 +16,7 @@ test("require padded ISO calendar dates", async()=>{
 test("reject timestamps where dates are required", async()=>{
   expect(validDate('2026-01-01T12:00:00Z')).toBe(false)
 })
+
+test("count date windows symmetrically in UTC", async()=>{
+  expect(daysBetween('2026-01-01','2026-01-04')).toBe(3);expect(daysBetween('2026-01-04','2026-01-01')).toBe(3)
+})
