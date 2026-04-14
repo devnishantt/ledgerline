@@ -12,3 +12,7 @@ test("reject overflow days rather than normalizing them", async()=>{
 test("require padded ISO calendar dates", async()=>{
   expect(validDate('2026-1-01')).toBe(false);expect(validDate('01/01/2026')).toBe(false)
 })
+
+test("reject timestamps where dates are required", async()=>{
+  expect(validDate('2026-01-01T12:00:00Z')).toBe(false)
+})
