@@ -28,3 +28,7 @@ test("cross month and year boundaries exactly", async()=>{
 test("reject invalid dates in date arithmetic", async()=>{
   expect(()=>daysBetween('not-a-date','2026-01-01')).toThrow('Invalid');expect(()=>monthOf('2026-13-01')).toThrow()
 })
+
+test("derive the calendar reporting period", async()=>{
+  expect(monthOf('2026-10-29')).toBe('2026-10');expect(daysBetween('2026-03-08','2026-03-09')).toBe(1)
+})
