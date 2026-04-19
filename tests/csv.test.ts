@@ -9,3 +9,7 @@ c,d')).toEqual([['a','b'],['c','d']])
 test("preserve quoted field delimiters", async()=>{
   expect(parseCsv('"a,b",c')).toEqual([['a,b','c']])
 })
+
+test("unescape doubled quotes", async()=>{
+  expect(parseCsv('"a""b",c')).toEqual([['a"b','c']])
+})
