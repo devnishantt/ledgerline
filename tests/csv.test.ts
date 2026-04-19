@@ -5,3 +5,7 @@ test("read UTF-8 byte-order marks", async()=>{
   expect(parseCsv('﻿a,b
 c,d')).toEqual([['a','b'],['c','d']])
 })
+
+test("preserve quoted field delimiters", async()=>{
+  expect(parseCsv('"a,b",c')).toEqual([['a,b','c']])
+})
