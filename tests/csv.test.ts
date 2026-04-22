@@ -13,3 +13,7 @@ test("preserve quoted field delimiters", async()=>{
 test("unescape doubled quotes", async()=>{
   expect(parseCsv('"a""b",c')).toEqual([['a"b','c']])
 })
+
+test("preserve line breaks inside quoted fields", async()=>{
+  expect(parseCsv('"a\nb",c')).toEqual([['a\nb','c']])
+})
