@@ -25,3 +25,7 @@ test("support Windows CRLF row separators", async()=>{
 test("skip blank separator rows", async()=>{
   expect(parseCsv('a,b\n\n\nc,d')).toHaveLength(2)
 })
+
+test("keep a trailing empty CSV cell", async()=>{
+  expect(parseCsv('a,b,')).toEqual([['a','b','']])
+})
