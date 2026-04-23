@@ -21,3 +21,7 @@ test("preserve line breaks inside quoted fields", async()=>{
 test("support Windows CRLF row separators", async()=>{
   expect(parseCsv('a,b\r\nc,d\r\n')).toEqual([['a','b'],['c','d']])
 })
+
+test("skip blank separator rows", async()=>{
+  expect(parseCsv('a,b\n\n\nc,d')).toHaveLength(2)
+})
