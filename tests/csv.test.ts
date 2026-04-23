@@ -17,3 +17,7 @@ test("unescape doubled quotes", async()=>{
 test("preserve line breaks inside quoted fields", async()=>{
   expect(parseCsv('"a\nb",c')).toEqual([['a\nb','c']])
 })
+
+test("support Windows CRLF row separators", async()=>{
+  expect(parseCsv('a,b\r\nc,d\r\n')).toEqual([['a','b'],['c','d']])
+})
