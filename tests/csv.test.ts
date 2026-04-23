@@ -29,3 +29,7 @@ test("skip blank separator rows", async()=>{
 test("keep a trailing empty CSV cell", async()=>{
   expect(parseCsv('a,b,')).toEqual([['a','b','']])
 })
+
+test("reject a quote inside unquoted content", async()=>{
+  expect(()=>parseCsv('ab"c,d')).toThrow('Unexpected quote')
+})
