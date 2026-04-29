@@ -33,3 +33,7 @@ test("keep a trailing empty CSV cell", async()=>{
 test("reject a quote inside unquoted content", async()=>{
   expect(()=>parseCsv('ab"c,d')).toThrow('Unexpected quote')
 })
+
+test("reject unterminated quoted fields", async()=>{
+  expect(()=>parseCsv('"unfinished')).toThrow('Unterminated')
+})
