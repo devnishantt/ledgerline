@@ -45,3 +45,7 @@ test("reject content after a closing quote", async()=>{
 test("reject empty statement documents", async()=>{
   expect(()=>parseCsv(' \n\r\n')).toThrow('empty')
 })
+
+test("bound CSV memory exposure", async()=>{
+  expect(()=>parseCsv('a'.repeat(200001))).toThrow('limit')
+})
