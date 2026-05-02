@@ -37,3 +37,7 @@ test("reject a quote inside unquoted content", async()=>{
 test("reject unterminated quoted fields", async()=>{
   expect(()=>parseCsv('"unfinished')).toThrow('Unterminated')
 })
+
+test("reject content after a closing quote", async()=>{
+  expect(()=>parseCsv('"a"b,c')).toThrow('closing quote')
+})
