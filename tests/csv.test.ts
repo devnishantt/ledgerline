@@ -61,3 +61,7 @@ test("neutralize formulas with whitespace prefixes", async()=>{
 test("serialize missing export values as blank cells", async()=>{
   expect(csvCell(null)).toBe('');expect(csvCell(undefined)).toBe('')
 })
+
+test("terminate exports with standards-compatible CRLF", async()=>{
+  expect(writeCsv(['a','b'],[[1,2]])).toBe('a,b\r\n1,2\r\n')
+})
