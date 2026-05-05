@@ -53,3 +53,7 @@ test("bound CSV memory exposure", async()=>{
 test("quote exported delimiter and quote characters", async()=>{
   expect(csvCell('a,b')).toBe('"a,b"');expect(csvCell('a"b')).toBe('"a""b"')
 })
+
+test("neutralize formulas with whitespace prefixes", async()=>{
+  for(const input of ['=SUM(A1)',' +1','-2','@cmd','\tcalc'])expect(csvCell(input).startsWith("'")).toBe(true)
+})
