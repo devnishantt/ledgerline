@@ -57,3 +57,7 @@ test("quote exported delimiter and quote characters", async()=>{
 test("neutralize formulas with whitespace prefixes", async()=>{
   for(const input of ['=SUM(A1)',' +1','-2','@cmd','\tcalc'])expect(csvCell(input).startsWith("'")).toBe(true)
 })
+
+test("serialize missing export values as blank cells", async()=>{
+  expect(csvCell(null)).toBe('');expect(csvCell(undefined)).toBe('')
+})
