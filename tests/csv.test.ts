@@ -49,3 +49,7 @@ test("reject empty statement documents", async()=>{
 test("bound CSV memory exposure", async()=>{
   expect(()=>parseCsv('a'.repeat(200001))).toThrow('limit')
 })
+
+test("quote exported delimiter and quote characters", async()=>{
+  expect(csvCell('a,b')).toBe('"a,b"');expect(csvCell('a"b')).toBe('"a""b"')
+})
