@@ -1,0 +1,6 @@
+import {test,expect} from 'bun:test'
+import {normalizeCsv,referenceKey} from '../src/domain/normalize'
+
+test("normalize decimals and preserve source identity", async()=>{
+  const rows=normalizeCsv("date,amount,currency,description,reference,external_id\n2026-10-01,12.50,USD,Invoice settlement,INV-1,ROW-1");expect(rows[0]).toMatchObject({amount:1250,currency:'USD',externalId:'ROW-1',reference:'INV-1'})
+})
