@@ -8,3 +8,7 @@ test("normalize decimals and preserve source identity", async()=>{
 test("normalize header whitespace and currency case", async()=>{
   expect(normalizeCsv(" Date , Amount , Currency , Description\n2026-10-01,1.00,usd, Payment ")[0]).toMatchObject({amount:100,currency:'USD',description:'Payment'})
 })
+
+test("allow missing optional reference columns", async()=>{
+  expect(normalizeCsv("date,amount,currency,description\n2026-10-01,1,USD,Payment")[0].reference).toBe('')
+})
