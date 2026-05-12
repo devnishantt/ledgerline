@@ -12,3 +12,7 @@ test("normalize header whitespace and currency case", async()=>{
 test("allow missing optional reference columns", async()=>{
   expect(normalizeCsv("date,amount,currency,description\n2026-10-01,1,USD,Payment")[0].reference).toBe('')
 })
+
+test("reject duplicate header names", async()=>{
+  expect(()=>normalizeCsv("date,amount,currency,description,date\n2026-10-01,1,USD,Payment,x")).toThrow('Duplicate column')
+})
