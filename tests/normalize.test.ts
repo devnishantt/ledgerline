@@ -16,3 +16,7 @@ test("allow missing optional reference columns", async()=>{
 test("reject duplicate header names", async()=>{
   expect(()=>normalizeCsv("date,amount,currency,description,date\n2026-10-01,1,USD,Payment,x")).toThrow('Duplicate column')
 })
+
+test("require all mandatory columns", async()=>{
+  expect(()=>normalizeCsv("date,amount,description\n2026-10-01,1,Payment")).toThrow('Missing column: currency')
+})
