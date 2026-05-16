@@ -24,3 +24,7 @@ test("require all mandatory columns", async()=>{
 test("reject header-only documents", async()=>{
   expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n")).toThrow('1–200')
 })
+
+test("enforce the import row count boundary", async()=>{
+  const row="2026-10-01,12.50,USD,Invoice settlement,INV-1,ROW-1";expect(normalizeCsv("date,amount,currency,description,reference,external_id\n"+Array.from({length:200},(_,i)=>row.replace('ROW-1','ROW-'+i)).join('\n'))).toHaveLength(200);expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n"+Array(201).fill(row).join('\n'))).toThrow('1–200')
+})
