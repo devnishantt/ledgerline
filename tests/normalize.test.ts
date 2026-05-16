@@ -20,3 +20,7 @@ test("reject duplicate header names", async()=>{
 test("require all mandatory columns", async()=>{
   expect(()=>normalizeCsv("date,amount,description\n2026-10-01,1,Payment")).toThrow('Missing column: currency')
 })
+
+test("reject header-only documents", async()=>{
+  expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n")).toThrow('1–200')
+})
