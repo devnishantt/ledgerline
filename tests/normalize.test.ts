@@ -32,3 +32,7 @@ test("enforce the import row count boundary", async()=>{
 test("reject rows with mismatched column counts", async()=>{
   expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n2026-10-01,12.50,USD,Invoice settlement,INV-1,ROW-1,extra")).toThrow('Row 2: column count')
 })
+
+test("report invalid calendar dates with source row numbers", async()=>{
+  expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n2026-02-30,12.50,USD,Invoice settlement,INV-1,ROW-1")).toThrow('Row 2: invalid calendar')
+})
