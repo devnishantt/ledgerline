@@ -40,3 +40,7 @@ test("report invalid calendar dates with source row numbers", async()=>{
 test("reject unrecognized row currencies", async()=>{
   expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n2026-10-01,12.50,BTC,Invoice settlement,INV-1,ROW-1")).toThrow('Row 2: unsupported currency')
 })
+
+test("require a meaningful row description", async()=>{
+  expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n2026-10-01,12.50,USD,,INV-1,ROW-1")).toThrow('text field length')
+})
