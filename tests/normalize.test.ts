@@ -36,3 +36,7 @@ test("reject rows with mismatched column counts", async()=>{
 test("report invalid calendar dates with source row numbers", async()=>{
   expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n2026-02-30,12.50,USD,Invoice settlement,INV-1,ROW-1")).toThrow('Row 2: invalid calendar')
 })
+
+test("reject unrecognized row currencies", async()=>{
+  expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n2026-10-01,12.50,BTC,Invoice settlement,INV-1,ROW-1")).toThrow('Row 2: unsupported currency')
+})
