@@ -48,3 +48,7 @@ test("require a meaningful row description", async()=>{
 test("reject duplicate external identifiers within one file", async()=>{
   expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n2026-10-01,12.50,USD,Invoice settlement,INV-1,ROW-1\n2026-10-01,12.50,USD,Invoice settlement,INV-1,ROW-1")).toThrow('duplicate external_id')
 })
+
+test("surface monetary parsing failures with source context", async()=>{
+  expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n2026-10-01,1e3,USD,Invoice settlement,INV-1,ROW-1")).toThrow('Row 2: Amount')
+})
