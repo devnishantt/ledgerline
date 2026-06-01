@@ -44,3 +44,7 @@ test("reject unrecognized row currencies", async()=>{
 test("require a meaningful row description", async()=>{
   expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n2026-10-01,12.50,USD,,INV-1,ROW-1")).toThrow('text field length')
 })
+
+test("reject duplicate external identifiers within one file", async()=>{
+  expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n2026-10-01,12.50,USD,Invoice settlement,INV-1,ROW-1\n2026-10-01,12.50,USD,Invoice settlement,INV-1,ROW-1")).toThrow('duplicate external_id')
+})
