@@ -52,3 +52,7 @@ test("reject duplicate external identifiers within one file", async()=>{
 test("surface monetary parsing failures with source context", async()=>{
   expect(()=>normalizeCsv("date,amount,currency,description,reference,external_id\n2026-10-01,1e3,USD,Invoice settlement,INV-1,ROW-1")).toThrow('Row 2: Amount')
 })
+
+test("canonicalize reference punctuation and Unicode width", async()=>{
+  expect(referenceKey(' INV-0042 ')).toBe('inv0042');expect(referenceKey('ＩＮＶ４２')).toBe('inv42');expect(referenceKey('---')).toBe('')
+})
