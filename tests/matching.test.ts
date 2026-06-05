@@ -13,3 +13,7 @@ test("reject matching across workspace boundaries", async()=>{
 test("reject matching across account boundaries", async()=>{
   expect(scorePair(transaction(),ledger({account_id:'other'}),policy())).toBeNull()
 })
+
+test("reject matching across currency boundaries", async()=>{
+  expect(scorePair(transaction(),ledger({currency:'EUR'}),policy())).toBeNull()
+})
