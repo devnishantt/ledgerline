@@ -17,3 +17,7 @@ test("reject matching across account boundaries", async()=>{
 test("reject matching across currency boundaries", async()=>{
   expect(scorePair(transaction(),ledger({currency:'EUR'}),policy())).toBeNull()
 })
+
+test("require bank-to-ledger direction", async()=>{
+  expect(scorePair(transaction({side:'ledger'}),ledger(),policy())).toBeNull();expect(scorePair(transaction(),ledger({side:'bank'}),policy())).toBeNull()
+})
