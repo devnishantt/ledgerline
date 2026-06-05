@@ -9,3 +9,7 @@ test("score exact same-day referenced pairs at one hundred", async()=>{
 test("reject matching across workspace boundaries", async()=>{
   expect(scorePair(transaction(),ledger({workspace_id:'other'}),policy())).toBeNull()
 })
+
+test("reject matching across account boundaries", async()=>{
+  expect(scorePair(transaction(),ledger({account_id:'other'}),policy())).toBeNull()
+})
