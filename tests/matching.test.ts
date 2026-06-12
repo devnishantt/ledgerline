@@ -21,3 +21,7 @@ test("reject matching across currency boundaries", async()=>{
 test("require bank-to-ledger direction", async()=>{
   expect(scorePair(transaction({side:'ledger'}),ledger(),policy())).toBeNull();expect(scorePair(transaction(),ledger({side:'bank'}),policy())).toBeNull()
 })
+
+test("reject differences outside amount tolerance", async()=>{
+  expect(scorePair(transaction(),ledger({amount:9900}),policy({tolerance:99}))).toBeNull()
+})
