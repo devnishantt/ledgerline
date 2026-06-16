@@ -25,3 +25,7 @@ test("require bank-to-ledger direction", async()=>{
 test("reject differences outside amount tolerance", async()=>{
   expect(scorePair(transaction(),ledger({amount:9900}),policy({tolerance:99}))).toBeNull()
 })
+
+test("accept the exact tolerance boundary with variance sign", async()=>{
+  expect(scorePair(transaction(),ledger({amount:9990}),policy({tolerance:10}))).toMatchObject({variance:10,score:80})
+})
