@@ -29,3 +29,7 @@ test("reject differences outside amount tolerance", async()=>{
 test("accept the exact tolerance boundary with variance sign", async()=>{
   expect(scorePair(transaction(),ledger({amount:9990}),policy({tolerance:10}))).toMatchObject({variance:10,score:80})
 })
+
+test("reject dates outside the settlement window", async()=>{
+  expect(scorePair(transaction(),ledger({date:'2026-10-05'}),policy())).toBeNull()
+})
