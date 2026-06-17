@@ -45,3 +45,7 @@ test("require aligned references when policy says require", async()=>{
 test("avoid treating two blank references as aligned", async()=>{
   expect(scorePair(transaction({reference:''}),ledger({reference:''}),policy({reference_mode:'require'}))).toBeNull()
 })
+
+test("ignore reference bonuses when policy says ignore", async()=>{
+  expect(scorePair(transaction(),ledger(),policy({reference_mode:'ignore'}))).toMatchObject({score:80})
+})
