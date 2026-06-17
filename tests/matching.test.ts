@@ -37,3 +37,7 @@ test("reject dates outside the settlement window", async()=>{
 test("decay score for a one-day settlement gap", async()=>{
   expect(scorePair(transaction(),ledger({date:'2026-10-02'}),policy())).toMatchObject({score:97})
 })
+
+test("require aligned references when policy says require", async()=>{
+  expect(scorePair(transaction(),ledger({reference:'other'}),policy({reference_mode:'require'}))).toBeNull()
+})
