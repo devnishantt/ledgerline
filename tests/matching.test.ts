@@ -33,3 +33,7 @@ test("accept the exact tolerance boundary with variance sign", async()=>{
 test("reject dates outside the settlement window", async()=>{
   expect(scorePair(transaction(),ledger({date:'2026-10-05'}),policy())).toBeNull()
 })
+
+test("decay score for a one-day settlement gap", async()=>{
+  expect(scorePair(transaction(),ledger({date:'2026-10-02'}),policy())).toMatchObject({score:97})
+})
