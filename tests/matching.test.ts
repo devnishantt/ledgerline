@@ -49,3 +49,7 @@ test("avoid treating two blank references as aligned", async()=>{
 test("ignore reference bonuses when policy says ignore", async()=>{
   expect(scorePair(transaction(),ledger(),policy({reference_mode:'ignore'}))).toMatchObject({score:80})
 })
+
+test("reject candidates below the minimum policy score", async()=>{
+  expect(scorePair(transaction(),ledger({reference:'unknown'}),policy({min_score:90}))).toBeNull()
+})
