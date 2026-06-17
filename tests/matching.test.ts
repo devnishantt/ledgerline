@@ -41,3 +41,7 @@ test("decay score for a one-day settlement gap", async()=>{
 test("require aligned references when policy says require", async()=>{
   expect(scorePair(transaction(),ledger({reference:'other'}),policy({reference_mode:'require'}))).toBeNull()
 })
+
+test("avoid treating two blank references as aligned", async()=>{
+  expect(scorePair(transaction({reference:''}),ledger({reference:''}),policy({reference_mode:'require'}))).toBeNull()
+})
