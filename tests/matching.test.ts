@@ -57,3 +57,7 @@ test("reject candidates below the minimum policy score", async()=>{
 test("return no proposals when one statement side is absent", async()=>{
   expect(propose([transaction()],policy())).toEqual([]);expect(propose([ledger()],policy())).toEqual([])
 })
+
+test("mark equal best ledger candidates as ambiguous", async()=>{
+  const result=propose([transaction(),ledger(),ledger({id:'ledger-2'})],policy());expect(result).toHaveLength(1);expect(result[0].ambiguous).toBe(true)
+})
