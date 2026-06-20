@@ -53,3 +53,7 @@ test("ignore reference bonuses when policy says ignore", async()=>{
 test("reject candidates below the minimum policy score", async()=>{
   expect(scorePair(transaction(),ledger({reference:'unknown'}),policy({min_score:90}))).toBeNull()
 })
+
+test("return no proposals when one statement side is absent", async()=>{
+  expect(propose([transaction()],policy())).toEqual([]);expect(propose([ledger()],policy())).toEqual([])
+})
