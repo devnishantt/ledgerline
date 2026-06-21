@@ -65,3 +65,7 @@ test("mark equal best ledger candidates as ambiguous", async()=>{
 test("mark competing equal bank candidates as ambiguous", async()=>{
   const result=propose([transaction(),transaction({id:'bank-2'}),ledger()],policy());expect(result).toHaveLength(2);expect(result.every(p=>p.ambiguous)).toBe(true)
 })
+
+test("prefer an unambiguous higher-scoring counterparty", async()=>{
+  const result=propose([transaction(),ledger(),ledger({id:'ledger-2',date:'2026-10-02'})],policy());expect(result[0]).toMatchObject({ledgerId:'ledger-1',ambiguous:false})
+})
