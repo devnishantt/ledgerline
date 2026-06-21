@@ -61,3 +61,7 @@ test("return no proposals when one statement side is absent", async()=>{
 test("mark equal best ledger candidates as ambiguous", async()=>{
   const result=propose([transaction(),ledger(),ledger({id:'ledger-2'})],policy());expect(result).toHaveLength(1);expect(result[0].ambiguous).toBe(true)
 })
+
+test("mark competing equal bank candidates as ambiguous", async()=>{
+  const result=propose([transaction(),transaction({id:'bank-2'}),ledger()],policy());expect(result).toHaveLength(2);expect(result.every(p=>p.ambiguous)).toBe(true)
+})
