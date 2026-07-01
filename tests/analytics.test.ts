@@ -14,3 +14,7 @@ test("do not count proposals as approved allocations", async()=>{
 test("count both sides of an approved pair as reconciled", async()=>{
   const m={id:'m',bank_id:'bank-1',ledger_id:'ledger-1',status:'approved'} as Match;const s=summarize([transaction(),ledger()],[m]);expect(s.unmatched).toBe(0);expect(s.approved).toBe(1)
 })
+
+test("retain rejected pairs as unresolved exposure", async()=>{
+  const m={id:'m',bank_id:'bank-1',ledger_id:'ledger-1',status:'rejected'} as Match;expect(summarize([transaction(),ledger()],[m])).toMatchObject({rejected:1,unmatched:2,approved:0})
+})
