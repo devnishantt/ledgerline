@@ -10,3 +10,7 @@ test("keep currency positions separate", async()=>{
 test("do not count proposals as approved allocations", async()=>{
   const m={id:'m',bank_id:'bank-1',ledger_id:'ledger-1',status:'proposed'} as Match;const s=summarize([transaction(),ledger()],[m]);expect(s.unmatched).toBe(2);expect(s.proposed).toBe(1);expect(s.approved).toBe(0)
 })
+
+test("count both sides of an approved pair as reconciled", async()=>{
+  const m={id:'m',bank_id:'bank-1',ledger_id:'ledger-1',status:'approved'} as Match;const s=summarize([transaction(),ledger()],[m]);expect(s.unmatched).toBe(0);expect(s.approved).toBe(1)
+})
