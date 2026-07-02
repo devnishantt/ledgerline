@@ -22,3 +22,7 @@ test("retain rejected pairs as unresolved exposure", async()=>{
 test("bucket ageing at the seven and thirty day boundaries", async()=>{
   expect(ageing('2026-10-01','2026-10-08')).toBe('0–7 days');expect(ageing('2026-10-01','2026-10-09')).toBe('8–30 days');expect(ageing('2026-09-01','2026-10-02')).toBe('31+ days')
 })
+
+test("handle empty reports and reject malformed ageing inputs", async()=>{
+  expect(summarize([],[])).toMatchObject({transactions:0,unmatched:0,currencies:[]});expect(()=>ageing('bad','2026-10-01')).toThrow('Invalid')
+})
