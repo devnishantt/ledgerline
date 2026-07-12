@@ -12,3 +12,7 @@ test("hash the standard SHA-256 empty input vector", async()=>{
 test("generate unique high-entropy credential values", async()=>{
   const key=newKey();expect(key).toMatch(/^ll_[a-f0-9]{64}$/);expect(newKey()).not.toBe(key)
 })
+
+test("compare equal and unequal secrets without length exceptions", async()=>{
+  expect(await secretEqual('same','same')).toBe(true);expect(await secretEqual('same','')).toBe(false)
+})
