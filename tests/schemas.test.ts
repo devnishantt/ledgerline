@@ -8,3 +8,7 @@ test("trim workspace names and reject empty names", async()=>{
 test("reject extra authority fields in strict workspace input", async()=>{
   expect(workspaceInput.safeParse({name:'Finance',role:'admin'}).success).toBe(false)
 })
+
+test("limit supported account currencies", async()=>{
+  expect(accountInput.safeParse({name:'Operating',currency:'BTC'}).success).toBe(false);expect(accountInput.parse({name:'Operating',currency:'JPY'}).institution).toBe('')
+})
