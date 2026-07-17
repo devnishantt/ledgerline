@@ -12,3 +12,7 @@ test("reject extra authority fields in strict workspace input", async()=>{
 test("limit supported account currencies", async()=>{
   expect(accountInput.safeParse({name:'Operating',currency:'BTC'}).success).toBe(false);expect(accountInput.parse({name:'Operating',currency:'JPY'}).institution).toBe('')
 })
+
+test("supply bounded default credential expiry", async()=>{
+  expect(keyInput.parse({label:'Reviewer',role:'reviewer'}).expiresInDays).toBe(30);expect(keyInput.safeParse({label:'Reviewer',role:'reviewer',expiresInDays:366}).success).toBe(false)
+})
