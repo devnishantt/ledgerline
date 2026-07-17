@@ -20,3 +20,7 @@ test("supply bounded default credential expiry", async()=>{
 test("reject invented credential roles", async()=>{
   expect(keyInput.safeParse({label:'Owner',role:'superadmin'}).success).toBe(false)
 })
+
+test("validate import account UUID and statement side", async()=>{
+  expect(importInput.safeParse({accountId:'wrong',side:'bank',filename:'x.csv',csv:'x'}).success).toBe(false);expect(importInput.safeParse({accountId:'00000000-0000-4000-8000-000000000001',side:'cash',filename:'x.csv',csv:'x'}).success).toBe(false)
+})
