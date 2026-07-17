@@ -16,3 +16,7 @@ test("limit supported account currencies", async()=>{
 test("supply bounded default credential expiry", async()=>{
   expect(keyInput.parse({label:'Reviewer',role:'reviewer'}).expiresInDays).toBe(30);expect(keyInput.safeParse({label:'Reviewer',role:'reviewer',expiresInDays:366}).success).toBe(false)
 })
+
+test("reject invented credential roles", async()=>{
+  expect(keyInput.safeParse({label:'Owner',role:'superadmin'}).success).toBe(false)
+})
