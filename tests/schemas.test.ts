@@ -24,3 +24,7 @@ test("reject invented credential roles", async()=>{
 test("validate import account UUID and statement side", async()=>{
   expect(importInput.safeParse({accountId:'wrong',side:'bank',filename:'x.csv',csv:'x'}).success).toBe(false);expect(importInput.safeParse({accountId:'00000000-0000-4000-8000-000000000001',side:'cash',filename:'x.csv',csv:'x'}).success).toBe(false)
 })
+
+test("bound rule tolerance in integer minor units", async()=>{
+  expect(ruleInput.safeParse({accountId:'00000000-0000-4000-8000-000000000001',name:'Policy',tolerance:0.5}).success).toBe(false);expect(ruleInput.safeParse({accountId:'00000000-0000-4000-8000-000000000001',name:'Policy',tolerance:10001}).success).toBe(false)
+})
