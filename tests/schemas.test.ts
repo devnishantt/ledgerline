@@ -32,3 +32,7 @@ test("bound rule tolerance in integer minor units", async()=>{
 test("bound settlement windows and minimum matching scores", async()=>{
   expect(ruleInput.safeParse({accountId:'00000000-0000-4000-8000-000000000001',name:'Policy',dateWindow:15}).success).toBe(false);expect(ruleInput.safeParse({accountId:'00000000-0000-4000-8000-000000000001',name:'Policy',minScore:101}).success).toBe(false)
 })
+
+test("supply conservative rule defaults", async()=>{
+  expect(ruleInput.parse({accountId:'00000000-0000-4000-8000-000000000001',name:'Policy'})).toMatchObject({tolerance:0,dateWindow:3,referenceMode:'prefer',minScore:75})
+})
