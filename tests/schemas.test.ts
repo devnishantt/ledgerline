@@ -44,3 +44,7 @@ test("require a valid rule reference for new runs", async()=>{
 test("require a meaningful immutable review rationale", async()=>{
   expect(decisionInput.safeParse({expectedRevision:0,decision:'approved',note:'ok'}).success).toBe(false);expect(decisionInput.parse({expectedRevision:0,decision:'rejected',note:' Does not align '}).note).toBe('Does not align')
 })
+
+test("reject negative and fractional revision claims", async()=>{
+  expect(finalizeInput.safeParse({expectedRevision:-1}).success).toBe(false);expect(finalizeInput.safeParse({expectedRevision:1.5}).success).toBe(false)
+})
