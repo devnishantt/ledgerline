@@ -36,3 +36,7 @@ test("bound settlement windows and minimum matching scores", async()=>{
 test("supply conservative rule defaults", async()=>{
   expect(ruleInput.parse({accountId:'00000000-0000-4000-8000-000000000001',name:'Policy'})).toMatchObject({tolerance:0,dateWindow:3,referenceMode:'prefer',minScore:75})
 })
+
+test("require a valid rule reference for new runs", async()=>{
+  expect(runInput.safeParse({accountId:'00000000-0000-4000-8000-000000000001',ruleId:'invalid',name:'Close'}).success).toBe(false)
+})
