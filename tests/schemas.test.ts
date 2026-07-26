@@ -40,3 +40,7 @@ test("supply conservative rule defaults", async()=>{
 test("require a valid rule reference for new runs", async()=>{
   expect(runInput.safeParse({accountId:'00000000-0000-4000-8000-000000000001',ruleId:'invalid',name:'Close'}).success).toBe(false)
 })
+
+test("require a meaningful immutable review rationale", async()=>{
+  expect(decisionInput.safeParse({expectedRevision:0,decision:'approved',note:'ok'}).success).toBe(false);expect(decisionInput.parse({expectedRevision:0,decision:'rejected',note:' Does not align '}).note).toBe('Does not align')
+})
