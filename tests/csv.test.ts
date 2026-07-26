@@ -2,8 +2,7 @@ import {test,expect} from 'bun:test'
 import {parseCsv,csvCell,writeCsv} from '../src/domain/csv'
 
 test("read UTF-8 byte-order marks", async()=>{
-  expect(parseCsv('﻿a,b
-c,d')).toEqual([['a','b'],['c','d']])
+  expect(parseCsv('\uFEFFa,b\nc,d')).toEqual([['a','b'],['c','d']])
 })
 
 test("preserve quoted field delimiters", async()=>{
