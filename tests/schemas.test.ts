@@ -48,3 +48,7 @@ test("require a meaningful immutable review rationale", async()=>{
 test("reject negative and fractional revision claims", async()=>{
   expect(finalizeInput.safeParse({expectedRevision:-1}).success).toBe(false);expect(finalizeInput.safeParse({expectedRevision:1.5}).success).toBe(false)
 })
+
+test("coerce pagination while rejecting excessive page sizes", async()=>{
+  expect(pageInput.parse({limit:'20',offset:'10'})).toMatchObject({limit:20,offset:10});expect(pageInput.safeParse({limit:'101'}).success).toBe(false);expect(pageInput.safeParse({offset:'-1'}).success).toBe(false)
+})
