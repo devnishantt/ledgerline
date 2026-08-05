@@ -21,3 +21,8 @@ test("require operator authorization for workspace bootstrap",async()=>{
  const f=await fixture()
  try { expect((await f.request('/workspaces','POST',{name:'Wrong operator'})).status).toBe(401) } finally { f.close() }
 })
+
+test("fail closed when operator setup is absent",async()=>{
+ const f=await fixture()
+ try { const r=await f.app.fetch(new Request('http://localhost/api/workspaces',{method:'POST',headers:{Authorization:'Bearer '+operator,'Content-Type':'application/json'},body:JSON.stringify({name:'New workspace'})}),{...f.env,BOOTSTRAP_TOKEN:''});expect(r.status).toBe(503) } finally { f.close() }
+})
