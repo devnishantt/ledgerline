@@ -16,3 +16,8 @@ test("expose current workspace and role without the raw key",async()=>{
  const f=await fixture()
  try { const me=await f.json('/me');expect(me.principal.role).toBe('admin');expect(me.workspace.name).toBe('Test operations');expect(JSON.stringify(me)).not.toContain(f.admin) } finally { f.close() }
 })
+
+test("require operator authorization for workspace bootstrap",async()=>{
+ const f=await fixture()
+ try { expect((await f.request('/workspaces','POST',{name:'Wrong operator'})).status).toBe(401) } finally { f.close() }
+})
