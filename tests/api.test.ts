@@ -41,3 +41,8 @@ test("revoke credentials immediately and audit the action",async()=>{
  const f=await fixture()
  try { const key=await f.key();expect((await f.request('/keys/'+key.id,'DELETE')).status).toBe(204);expect((await f.request('/me','GET',undefined,key.key)).status).toBe(401);expect((await f.json('/audit/verify')).valid).toBe(true) } finally { f.close() }
 })
+
+test("reject self-revocation of the active administrator",async()=>{
+ const f=await fixture()
+ try { const me=await f.json('/me');expect((await f.request('/keys/'+me.principal.id,'DELETE')).status).toBe(409) } finally { f.close() }
+})
