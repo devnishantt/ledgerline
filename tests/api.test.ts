@@ -46,3 +46,8 @@ test("reject self-revocation of the active administrator",async()=>{
  const f=await fixture()
  try { const me=await f.json('/me');expect((await f.request('/keys/'+me.principal.id,'DELETE')).status).toBe(409) } finally { f.close() }
 })
+
+test("limit credential metadata to administrators",async()=>{
+ const f=await fixture()
+ try { const viewer=await f.key('viewer');expect((await f.request('/keys','GET',undefined,viewer.key)).status).toBe(403);expect((await f.request('/keys','POST',{label:'Escalation',role:'admin'},viewer.key)).status).toBe(403) } finally { f.close() }
+})
