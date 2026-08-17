@@ -56,3 +56,8 @@ test("permit viewer reads but forbid account creation",async()=>{
  const f=await fixture()
  try { const key=await f.key('viewer');expect((await f.request('/accounts','GET',undefined,key.key)).status).toBe(200);expect((await f.request('/accounts','POST',{name:'Unauthorized',currency:'USD'},key.key)).status).toBe(403) } finally { f.close() }
 })
+
+test("reject unknown account fields",async()=>{
+ const f=await fixture()
+ try { expect((await f.request('/accounts','POST',{name:'Operating',currency:'USD',workspace_id:'injected'})).status).toBe(400) } finally { f.close() }
+})
