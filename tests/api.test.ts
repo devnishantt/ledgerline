@@ -66,3 +66,8 @@ test("prevent duplicate account names within a tenant",async()=>{
  const f=await fixture()
  try { await f.account();expect((await f.request('/accounts','POST',{name:'Operating account',currency:'USD'})).status).toBe(409) } finally { f.close() }
 })
+
+test("isolate account listings across workspaces",async()=>{
+ const f=await fixture()
+ try { await f.account();const second=await f.json('/workspaces','POST',{name:'Other tenant'},operator);expect((await f.json('/accounts','GET',undefined,second.apiKey.key)).items).toHaveLength(0) } finally { f.close() }
+})
