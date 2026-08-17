@@ -61,3 +61,8 @@ test("reject unknown account fields",async()=>{
  const f=await fixture()
  try { expect((await f.request('/accounts','POST',{name:'Operating',currency:'USD',workspace_id:'injected'})).status).toBe(400) } finally { f.close() }
 })
+
+test("prevent duplicate account names within a tenant",async()=>{
+ const f=await fixture()
+ try { await f.account();expect((await f.request('/accounts','POST',{name:'Operating account',currency:'USD'})).status).toBe(409) } finally { f.close() }
+})
