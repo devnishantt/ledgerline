@@ -76,3 +76,8 @@ test("hide another tenants account during import preview",async()=>{
  const f=await fixture()
  try { const a=await f.account(),second=await f.json('/workspaces','POST',{name:'Other tenant'},operator);expect((await f.request('/imports/preview','POST',{accountId:a.id,side:'bank',filename:'a.csv',csv:sampleBank},second.apiKey.key)).status).toBe(404) } finally { f.close() }
 })
+
+test("preview imports without persisting statements",async()=>{
+ const f=await fixture()
+ try { const a=await f.account();const preview=await f.json('/imports/preview','POST',{accountId:a.id,side:'bank',filename:'a.csv',csv:sampleBank});expect(preview.total).toBe(4);expect((await f.json('/transactions')).total).toBe(0);expect((await f.json('/imports')).items).toHaveLength(0) } finally { f.close() }
+})
