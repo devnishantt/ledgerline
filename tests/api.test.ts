@@ -71,3 +71,8 @@ test("isolate account listings across workspaces",async()=>{
  const f=await fixture()
  try { await f.account();const second=await f.json('/workspaces','POST',{name:'Other tenant'},operator);expect((await f.json('/accounts','GET',undefined,second.apiKey.key)).items).toHaveLength(0) } finally { f.close() }
 })
+
+test("hide another tenants account during import preview",async()=>{
+ const f=await fixture()
+ try { const a=await f.account(),second=await f.json('/workspaces','POST',{name:'Other tenant'},operator);expect((await f.request('/imports/preview','POST',{accountId:a.id,side:'bank',filename:'a.csv',csv:sampleBank},second.apiKey.key)).status).toBe(404) } finally { f.close() }
+})
