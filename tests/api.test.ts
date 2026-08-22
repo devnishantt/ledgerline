@@ -86,3 +86,8 @@ test("reject account and row currency mismatches",async()=>{
  const f=await fixture()
  try { const a=await f.account('EUR');const r=await f.request('/imports','POST',{accountId:a.id,side:'bank',filename:'a.csv',csv:sampleBank});expect(r.status).toBe(400);expect((await r.json() as any).error.code).toBe('CURRENCY_MISMATCH') } finally { f.close() }
 })
+
+test("ingest a statement atomically and expose exact amounts",async()=>{
+ const f=await fixture()
+ try { const a=await f.account();await f.json('/imports','POST',{accountId:a.id,side:'bank',filename:'a.csv',csv:sampleBank});const data=await f.json('/transactions');expect(data.total).toBe(4);expect(data.items.find((t:any)=>t.reference==='INV-1042').amount).toBe(125000) } finally { f.close() }
+})
