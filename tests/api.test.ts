@@ -81,3 +81,8 @@ test("preview imports without persisting statements",async()=>{
  const f=await fixture()
  try { const a=await f.account();const preview=await f.json('/imports/preview','POST',{accountId:a.id,side:'bank',filename:'a.csv',csv:sampleBank});expect(preview.total).toBe(4);expect((await f.json('/transactions')).total).toBe(0);expect((await f.json('/imports')).items).toHaveLength(0) } finally { f.close() }
 })
+
+test("reject account and row currency mismatches",async()=>{
+ const f=await fixture()
+ try { const a=await f.account('EUR');const r=await f.request('/imports','POST',{accountId:a.id,side:'bank',filename:'a.csv',csv:sampleBank});expect(r.status).toBe(400);expect((await r.json() as any).error.code).toBe('CURRENCY_MISMATCH') } finally { f.close() }
+})
