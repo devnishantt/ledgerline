@@ -96,3 +96,8 @@ test("reject duplicate normalized statement imports",async()=>{
  const f=await fixture()
  try { const a=await f.account(),input={accountId:a.id,side:'bank',filename:'a.csv',csv:sampleBank};await f.json('/imports','POST',input);expect((await f.request('/imports','POST',input)).status).toBe(409);expect((await f.json('/transactions')).total).toBe(4) } finally { f.close() }
 })
+
+test("roll back every row after a mid-import failure",async()=>{
+ const f=await fixture()
+ try { const a=await f.account();f.db.failAt=3;expect((await f.request('/imports','POST',{accountId:a.id,side:'bank',filename:'a.csv',csv:sampleBank})).status).toBe(503);expect((await f.json('/transactions')).total).toBe(0);expect((await f.json('/imports')).items).toHaveLength(0);expect((await f.json('/audit/verify')).valid).toBe(true) } finally { f.close() }
+})
