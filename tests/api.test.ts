@@ -101,3 +101,8 @@ test("roll back every row after a mid-import failure",async()=>{
  const f=await fixture()
  try { const a=await f.account();f.db.failAt=3;expect((await f.request('/imports','POST',{accountId:a.id,side:'bank',filename:'a.csv',csv:sampleBank})).status).toBe(503);expect((await f.json('/transactions')).total).toBe(0);expect((await f.json('/imports')).items).toHaveLength(0);expect((await f.json('/audit/verify')).valid).toBe(true) } finally { f.close() }
 })
+
+test("reject invalid CSV with indexed validation errors",async()=>{
+ const f=await fixture()
+ try { const a=await f.account(),r=await f.request('/imports','POST',{accountId:a.id,side:'bank',filename:'a.csv',csv:'date,amount,currency,description\n2026-02-30,1,USD,Bad date'});expect(r.status).toBe(400);expect((await r.json() as any).error.message).toContain('Row 2') } finally { f.close() }
+})
