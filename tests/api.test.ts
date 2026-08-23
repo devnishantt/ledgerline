@@ -91,3 +91,8 @@ test("ingest a statement atomically and expose exact amounts",async()=>{
  const f=await fixture()
  try { const a=await f.account();await f.json('/imports','POST',{accountId:a.id,side:'bank',filename:'a.csv',csv:sampleBank});const data=await f.json('/transactions');expect(data.total).toBe(4);expect(data.items.find((t:any)=>t.reference==='INV-1042').amount).toBe(125000) } finally { f.close() }
 })
+
+test("reject duplicate normalized statement imports",async()=>{
+ const f=await fixture()
+ try { const a=await f.account(),input={accountId:a.id,side:'bank',filename:'a.csv',csv:sampleBank};await f.json('/imports','POST',input);expect((await f.request('/imports','POST',input)).status).toBe(409);expect((await f.json('/transactions')).total).toBe(4) } finally { f.close() }
+})
