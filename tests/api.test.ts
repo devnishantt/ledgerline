@@ -116,3 +116,8 @@ test("paginate statement feeds without overlapping IDs",async()=>{
  const f=await prepared()
  try { const a=await f.json('/transactions?limit=2&offset=0'),b=await f.json('/transactions?limit=2&offset=2');expect(a.items).toHaveLength(2);expect(new Set([...a.items,...b.items].map((x:any)=>x.id)).size).toBe(4) } finally { f.close() }
 })
+
+test("bind search inputs instead of interpreting SQL fragments",async()=>{
+ const f=await prepared()
+ try { const r=await f.json('/transactions?search='+encodeURIComponent("' OR 1=1 --"));expect(r.total).toBe(0) } finally { f.close() }
+})
