@@ -126,3 +126,8 @@ test("reject invalid query pagination boundaries",async()=>{
  const f=await fixture()
  try { expect((await f.request('/transactions?limit=101')).status).toBe(400);expect((await f.request('/transactions?offset=-1')).status).toBe(400) } finally { f.close() }
 })
+
+test("require rules to belong to the selected account",async()=>{
+ const f=await prepared()
+ try { const other=await f.account('USD','Other period');const rule=await f.json('/rules','POST',{accountId:other.id,name:'Other rule'});expect((await f.request('/runs','POST',{accountId:f.account.id,ruleId:rule.id,name:'Invalid run'})).status).toBe(404) } finally { f.close() }
+})
