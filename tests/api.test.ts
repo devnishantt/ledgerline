@@ -111,3 +111,8 @@ test("filter statement rows by account and source side",async()=>{
  const f=await prepared()
  try { const data=await f.json('/transactions?accountId='+f.account.id+'&side=ledger');expect(data.total).toBe(3);expect(data.items.every((t:any)=>t.side==='ledger')).toBe(true) } finally { f.close() }
 })
+
+test("paginate statement feeds without overlapping IDs",async()=>{
+ const f=await prepared()
+ try { const a=await f.json('/transactions?limit=2&offset=0'),b=await f.json('/transactions?limit=2&offset=2');expect(a.items).toHaveLength(2);expect(new Set([...a.items,...b.items].map((x:any)=>x.id)).size).toBe(4) } finally { f.close() }
+})
