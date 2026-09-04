@@ -106,3 +106,8 @@ test("reject invalid CSV with indexed validation errors",async()=>{
  const f=await fixture()
  try { const a=await f.account(),r=await f.request('/imports','POST',{accountId:a.id,side:'bank',filename:'a.csv',csv:'date,amount,currency,description\n2026-02-30,1,USD,Bad date'});expect(r.status).toBe(400);expect((await r.json() as any).error.message).toContain('Row 2') } finally { f.close() }
 })
+
+test("filter statement rows by account and source side",async()=>{
+ const f=await prepared()
+ try { const data=await f.json('/transactions?accountId='+f.account.id+'&side=ledger');expect(data.total).toBe(3);expect(data.items.every((t:any)=>t.side==='ledger')).toBe(true) } finally { f.close() }
+})
