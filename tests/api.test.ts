@@ -121,3 +121,8 @@ test("bind search inputs instead of interpreting SQL fragments",async()=>{
  const f=await prepared()
  try { const r=await f.json('/transactions?search='+encodeURIComponent("' OR 1=1 --"));expect(r.total).toBe(0) } finally { f.close() }
 })
+
+test("reject invalid query pagination boundaries",async()=>{
+ const f=await fixture()
+ try { expect((await f.request('/transactions?limit=101')).status).toBe(400);expect((await f.request('/transactions?offset=-1')).status).toBe(400) } finally { f.close() }
+})
