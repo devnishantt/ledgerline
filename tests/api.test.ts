@@ -131,3 +131,8 @@ test("require rules to belong to the selected account",async()=>{
  const f=await prepared()
  try { const other=await f.account('USD','Other period');const rule=await f.json('/rules','POST',{accountId:other.id,name:'Other rule'});expect((await f.request('/runs','POST',{accountId:f.account.id,ruleId:rule.id,name:'Invalid run'})).status).toBe(404) } finally { f.close() }
 })
+
+test("require both statement sources before matching",async()=>{
+ const f=await fixture()
+ try { const a=await f.account();await f.json('/imports','POST',{accountId:a.id,side:'bank',filename:'bank.csv',csv:sampleBank});const rule=await f.json('/rules','POST',{accountId:a.id,name:'Policy'});expect((await f.request('/runs','POST',{accountId:a.id,ruleId:rule.id,name:'Unilateral'})).status).toBe(409) } finally { f.close() }
+})
