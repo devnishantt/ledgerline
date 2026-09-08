@@ -136,3 +136,8 @@ test("require both statement sources before matching",async()=>{
  const f=await fixture()
  try { const a=await f.account();await f.json('/imports','POST',{accountId:a.id,side:'bank',filename:'bank.csv',csv:sampleBank});const rule=await f.json('/rules','POST',{accountId:a.id,name:'Policy'});expect((await f.request('/runs','POST',{accountId:a.id,ruleId:rule.id,name:'Unilateral'})).status).toBe(409) } finally { f.close() }
 })
+
+test("snapshot transactions and persist explainable safe proposals",async()=>{
+ const f=await prepared()
+ try { expect(f.detail.transactions).toHaveLength(7);expect(f.detail.matches).toHaveLength(3);expect(f.detail.matches.every((m:any)=>m.reason&&m.status==='proposed')).toBe(true);expect(f.detail.summary.unmatched).toBe(7) } finally { f.close() }
+})
