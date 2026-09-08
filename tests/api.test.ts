@@ -141,3 +141,8 @@ test("snapshot transactions and persist explainable safe proposals",async()=>{
  const f=await prepared()
  try { expect(f.detail.transactions).toHaveLength(7);expect(f.detail.matches).toHaveLength(3);expect(f.detail.matches.every((m:any)=>m.reason&&m.status==='proposed')).toBe(true);expect(f.detail.summary.unmatched).toBe(7) } finally { f.close() }
 })
+
+test("hide another tenants run and export",async()=>{
+ const f=await prepared()
+ try { const other=await f.json('/workspaces','POST',{name:'Other operations'},operator);expect((await f.request('/runs/'+f.detail.run.id,'GET',undefined,other.apiKey.key)).status).toBe(404);expect((await f.request('/runs/'+f.detail.run.id+'/export','GET',undefined,other.apiKey.key)).status).toBe(404) } finally { f.close() }
+})
