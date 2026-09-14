@@ -146,3 +146,8 @@ test("hide another tenants run and export",async()=>{
  const f=await prepared()
  try { const other=await f.json('/workspaces','POST',{name:'Other operations'},operator);expect((await f.request('/runs/'+f.detail.run.id,'GET',undefined,other.apiKey.key)).status).toBe(404);expect((await f.request('/runs/'+f.detail.run.id+'/export','GET',undefined,other.apiKey.key)).status).toBe(404) } finally { f.close() }
 })
+
+test("forbid the run creator from reviewing their own proposals",async()=>{
+ const f=await prepared()
+ try { const m=f.detail.matches[0];expect((await f.request('/runs/'+f.detail.run.id+'/matches/'+m.id,'POST',{expectedRevision:0,decision:'approved',note:'Reviewed evidence carefully'})).status).toBe(403) } finally { f.close() }
+})
