@@ -151,3 +151,8 @@ test("forbid the run creator from reviewing their own proposals",async()=>{
  const f=await prepared()
  try { const m=f.detail.matches[0];expect((await f.request('/runs/'+f.detail.run.id+'/matches/'+m.id,'POST',{expectedRevision:0,decision:'approved',note:'Reviewed evidence carefully'})).status).toBe(403) } finally { f.close() }
 })
+
+test("allow a distinct reviewer to approve and allocate both records",async()=>{
+ const f=await prepared()
+ try { const m=f.detail.matches[0],d=await f.json('/runs/'+f.detail.run.id+'/matches/'+m.id,'POST',{expectedRevision:0,decision:'approved',note:'Independent review complete'},f.reviewer.key);expect(d.run.revision).toBe(1);expect(d.summary.approved).toBe(1);expect(d.summary.unmatched).toBe(5);expect(f.db.raw.query('SELECT COUNT(*) AS n FROM approved_allocations').get()).toEqual({n:2}) } finally { f.close() }
+})
