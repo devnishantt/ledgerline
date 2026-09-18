@@ -156,3 +156,8 @@ test("allow a distinct reviewer to approve and allocate both records",async()=>{
  const f=await prepared()
  try { const m=f.detail.matches[0],d=await f.json('/runs/'+f.detail.run.id+'/matches/'+m.id,'POST',{expectedRevision:0,decision:'approved',note:'Independent review complete'},f.reviewer.key);expect(d.run.revision).toBe(1);expect(d.summary.approved).toBe(1);expect(d.summary.unmatched).toBe(5);expect(f.db.raw.query('SELECT COUNT(*) AS n FROM approved_allocations').get()).toEqual({n:2}) } finally { f.close() }
 })
+
+test("reject stale run revisions without changing decisions",async()=>{
+ const f=await prepared()
+ try { const m=f.detail.matches[0];expect((await f.request('/runs/'+f.detail.run.id+'/matches/'+m.id,'POST',{expectedRevision:7,decision:'approved',note:'Independent review complete'},f.reviewer.key)).status).toBe(409);expect((await f.json('/runs/'+f.detail.run.id)).summary.approved).toBe(0) } finally { f.close() }
+})
