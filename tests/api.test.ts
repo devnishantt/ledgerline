@@ -166,3 +166,8 @@ test("retain rejected pairs as unresolved without reserving funds",async()=>{
  const f=await prepared()
  try { const m=f.detail.matches[0],d=await f.json('/runs/'+f.detail.run.id+'/matches/'+m.id,'POST',{expectedRevision:0,decision:'rejected',note:'References require investigation'},f.reviewer.key);expect(d.summary.rejected).toBe(1);expect(d.summary.unmatched).toBe(7);expect(f.db.raw.query('SELECT COUNT(*) AS n FROM approved_allocations').get()).toEqual({n:0}) } finally { f.close() }
 })
+
+test("make an existing review decision immutable",async()=>{
+ const f=await prepared()
+ try { const m=f.detail.matches[0],path='/runs/'+f.detail.run.id+'/matches/'+m.id;await f.json(path,'POST',{expectedRevision:0,decision:'approved',note:'Independent review complete'},f.reviewer.key);expect((await f.request(path,'POST',{expectedRevision:1,decision:'rejected',note:'Attempt to change decision'},f.reviewer.key)).status).toBe(409) } finally { f.close() }
+})
