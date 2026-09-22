@@ -171,3 +171,8 @@ test("make an existing review decision immutable",async()=>{
  const f=await prepared()
  try { const m=f.detail.matches[0],path='/runs/'+f.detail.run.id+'/matches/'+m.id;await f.json(path,'POST',{expectedRevision:0,decision:'approved',note:'Independent review complete'},f.reviewer.key);expect((await f.request(path,'POST',{expectedRevision:1,decision:'rejected',note:'Attempt to change decision'},f.reviewer.key)).status).toBe(409) } finally { f.close() }
 })
+
+test("require all proposals reviewed before finalizing",async()=>{
+ const f=await prepared()
+ try { const r=await f.request('/runs/'+f.detail.run.id+'/finalize','POST',{expectedRevision:0});expect(r.status).toBe(409);expect((await r.json() as any).error.code).toBe('REVIEW_REQUIRED') } finally { f.close() }
+})
