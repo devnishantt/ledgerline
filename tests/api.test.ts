@@ -176,3 +176,8 @@ test("require all proposals reviewed before finalizing",async()=>{
  const f=await prepared()
  try { const r=await f.request('/runs/'+f.detail.run.id+'/finalize','POST',{expectedRevision:0});expect(r.status).toBe(409);expect((await r.json() as any).error.code).toBe('REVIEW_REQUIRED') } finally { f.close() }
 })
+
+test("finalize a reviewed run while retaining explicit exceptions",async()=>{
+ const f=await prepared()
+ try { let rev=0;for(const m of f.detail.matches)await f.json('/runs/'+f.detail.run.id+'/matches/'+m.id,'POST',{expectedRevision:rev++,decision:'approved',note:'Independent review complete'},f.reviewer.key);const d=await f.json('/runs/'+f.detail.run.id+'/finalize','POST',{expectedRevision:rev});expect(d.run.status).toBe('finalized');expect(d.summary.unmatched).toBe(1);expect(d.run.finalized_at).not.toBeNull() } finally { f.close() }
+})
