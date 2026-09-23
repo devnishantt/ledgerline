@@ -181,3 +181,8 @@ test("finalize a reviewed run while retaining explicit exceptions",async()=>{
  const f=await prepared()
  try { let rev=0;for(const m of f.detail.matches)await f.json('/runs/'+f.detail.run.id+'/matches/'+m.id,'POST',{expectedRevision:rev++,decision:'approved',note:'Independent review complete'},f.reviewer.key);const d=await f.json('/runs/'+f.detail.run.id+'/finalize','POST',{expectedRevision:rev});expect(d.run.status).toBe('finalized');expect(d.summary.unmatched).toBe(1);expect(d.run.finalized_at).not.toBeNull() } finally { f.close() }
 })
+
+test("reject finalization by a reviewer credential",async()=>{
+ const f=await prepared()
+ try { expect((await f.request('/runs/'+f.detail.run.id+'/finalize','POST',{expectedRevision:0},f.reviewer.key)).status).toBe(403) } finally { f.close() }
+})
