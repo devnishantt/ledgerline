@@ -186,3 +186,8 @@ test("reject finalization by a reviewer credential",async()=>{
  const f=await prepared()
  try { expect((await f.request('/runs/'+f.detail.run.id+'/finalize','POST',{expectedRevision:0},f.reviewer.key)).status).toBe(403) } finally { f.close() }
 })
+
+test("prevent the same statement from being approved in two runs",async()=>{
+ const f=await prepared()
+ try { const second=await f.json('/runs','POST',{accountId:f.account.id,ruleId:f.rule.id,name:'Duplicate allocation attempt'});const a=f.detail.matches[0],b=second.matches.find((m:any)=>m.bank_id===a.bank_id);await f.json('/runs/'+f.detail.run.id+'/matches/'+a.id,'POST',{expectedRevision:0,decision:'approved',note:'Primary review complete'},f.reviewer.key);expect((await f.request('/runs/'+second.run.id+'/matches/'+b.id,'POST',{expectedRevision:0,decision:'approved',note:'Duplicate allocation attempt'},f.reviewer.key)).status).toBe(409);expect((await f.json('/runs/'+second.run.id)).run.revision).toBe(0) } finally { f.close() }
+})
