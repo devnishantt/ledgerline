@@ -191,3 +191,8 @@ test("prevent the same statement from being approved in two runs",async()=>{
  const f=await prepared()
  try { const second=await f.json('/runs','POST',{accountId:f.account.id,ruleId:f.rule.id,name:'Duplicate allocation attempt'});const a=f.detail.matches[0],b=second.matches.find((m:any)=>m.bank_id===a.bank_id);await f.json('/runs/'+f.detail.run.id+'/matches/'+a.id,'POST',{expectedRevision:0,decision:'approved',note:'Primary review complete'},f.reviewer.key);expect((await f.request('/runs/'+second.run.id+'/matches/'+b.id,'POST',{expectedRevision:0,decision:'approved',note:'Duplicate allocation attempt'},f.reviewer.key)).status).toBe(409);expect((await f.json('/runs/'+second.run.id)).run.revision).toBe(0) } finally { f.close() }
 })
+
+test("roll back allocations and decisions after a review batch failure",async()=>{
+ const f=await prepared()
+ try { const m=f.detail.matches[0];f.db.failAt=4;expect((await f.request('/runs/'+f.detail.run.id+'/matches/'+m.id,'POST',{expectedRevision:0,decision:'approved',note:'Independent review complete'},f.reviewer.key)).status).toBe(503);expect((await f.json('/runs/'+f.detail.run.id)).run.revision).toBe(0);expect(f.db.raw.query('SELECT COUNT(*) AS n FROM approved_allocations').get()).toEqual({n:0});expect((await f.json('/audit/verify')).valid).toBe(true) } finally { f.close() }
+})
