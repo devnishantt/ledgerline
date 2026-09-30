@@ -196,3 +196,8 @@ test("roll back allocations and decisions after a review batch failure",async()=
  const f=await prepared()
  try { const m=f.detail.matches[0];f.db.failAt=4;expect((await f.request('/runs/'+f.detail.run.id+'/matches/'+m.id,'POST',{expectedRevision:0,decision:'approved',note:'Independent review complete'},f.reviewer.key)).status).toBe(503);expect((await f.json('/runs/'+f.detail.run.id)).run.revision).toBe(0);expect(f.db.raw.query('SELECT COUNT(*) AS n FROM approved_allocations').get()).toEqual({n:0});expect((await f.json('/audit/verify')).valid).toBe(true) } finally { f.close() }
 })
+
+test("export review context with exact monetary values",async()=>{
+ const f=await prepared()
+ try { const r=await f.request('/runs/'+f.detail.run.id+'/export');expect(r.headers.get('Content-Type')).toContain('text/csv');expect(r.headers.get('Content-Disposition')).toContain('attachment');const csv=await r.text();expect(csv).toContain('review_note');expect(csv).toContain('1250.00') } finally { f.close() }
+})
