@@ -201,3 +201,8 @@ test("export review context with exact monetary values",async()=>{
  const f=await prepared()
  try { const r=await f.request('/runs/'+f.detail.run.id+'/export');expect(r.headers.get('Content-Type')).toContain('text/csv');expect(r.headers.get('Content-Disposition')).toContain('attachment');const csv=await r.text();expect(csv).toContain('review_note');expect(csv).toContain('1250.00') } finally { f.close() }
 })
+
+test("verify the full tenant audit chain",async()=>{
+ const f=await prepared()
+ try { const v=await f.json('/audit/verify');expect(v.valid).toBe(true);expect(v.verified).toBeGreaterThan(5);expect(v.head).toHaveLength(64) } finally { f.close() }
+})
