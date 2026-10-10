@@ -211,3 +211,8 @@ test("reject SQL updates and deletes on immutable audit events",async()=>{
  const f=await fixture()
  try { expect(()=>f.db.raw.exec("UPDATE audit_events SET action='forged'")).toThrow('immutable');expect(()=>f.db.raw.exec('DELETE FROM audit_events')).toThrow('immutable') } finally { f.close() }
 })
+
+test("detect altered audit payloads after privileged trigger removal",async()=>{
+ const f=await fixture()
+ try { f.db.raw.exec("DROP TRIGGER audit_no_update; UPDATE audit_events SET payload='{}' WHERE sequence=0");const v=await f.json('/audit/verify');expect(v.valid).toBe(false);expect(v.brokenAt).toBe(0) } finally { f.close() }
+})
