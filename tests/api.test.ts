@@ -216,3 +216,8 @@ test("detect altered audit payloads after privileged trigger removal",async()=>{
  const f=await fixture()
  try { f.db.raw.exec("DROP TRIGGER audit_no_update; UPDATE audit_events SET payload='{}' WHERE sequence=0");const v=await f.json('/audit/verify');expect(v.valid).toBe(false);expect(v.brokenAt).toBe(0) } finally { f.close() }
 })
+
+test("detect missing final audit events rather than accepting a prefix",async()=>{
+ const f=await fixture()
+ try { await f.account();f.db.raw.exec('DROP TRIGGER audit_no_delete; DELETE FROM audit_events WHERE sequence=1');const v=await f.json('/audit/verify');expect(v.valid).toBe(false);expect(v.brokenAt).toBe(1) } finally { f.close() }
+})
