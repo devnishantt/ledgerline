@@ -206,3 +206,8 @@ test("verify the full tenant audit chain",async()=>{
  const f=await prepared()
  try { const v=await f.json('/audit/verify');expect(v.valid).toBe(true);expect(v.verified).toBeGreaterThan(5);expect(v.head).toHaveLength(64) } finally { f.close() }
 })
+
+test("reject SQL updates and deletes on immutable audit events",async()=>{
+ const f=await fixture()
+ try { expect(()=>f.db.raw.exec("UPDATE audit_events SET action='forged'")).toThrow('immutable');expect(()=>f.db.raw.exec('DELETE FROM audit_events')).toThrow('immutable') } finally { f.close() }
+})
