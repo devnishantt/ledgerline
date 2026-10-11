@@ -221,3 +221,8 @@ test("detect missing final audit events rather than accepting a prefix",async()=
  const f=await fixture()
  try { await f.account();f.db.raw.exec('DROP TRIGGER audit_no_delete; DELETE FROM audit_events WHERE sequence=1');const v=await f.json('/audit/verify');expect(v.valid).toBe(false);expect(v.brokenAt).toBe(1) } finally { f.close() }
 })
+
+test("page audit events with stable sequence cursors",async()=>{
+ const f=await prepared()
+ try { const first=await f.json('/audit?after=0');expect(first.items.every((e:any)=>e.sequence>0)).toBe(true);expect(first.nextAfter).toBe(first.items.at(-1).sequence) } finally { f.close() }
+})
