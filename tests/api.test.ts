@@ -226,3 +226,8 @@ test("page audit events with stable sequence cursors",async()=>{
  const f=await prepared()
  try { const first=await f.json('/audit?after=0');expect(first.items.every((e:any)=>e.sequence>0)).toBe(true);expect(first.nextAfter).toBe(first.items.at(-1).sequence) } finally { f.close() }
 })
+
+test("report dashboard counts without inventing approval totals",async()=>{
+ const f=await prepared()
+ try { const d=await f.json('/dashboard');expect(d.counts.accounts).toBe(1);expect(d.counts.imports).toBe(2);expect(d.summary.approved).toBe(0);expect(d.summary.proposed).toBe(3);expect(d.summary.currencies).toHaveLength(1) } finally { f.close() }
+})
