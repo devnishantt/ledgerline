@@ -231,3 +231,8 @@ test("report dashboard counts without inventing approval totals",async()=>{
  const f=await prepared()
  try { const d=await f.json('/dashboard');expect(d.counts.accounts).toBe(1);expect(d.counts.imports).toBe(2);expect(d.summary.approved).toBe(0);expect(d.summary.proposed).toBe(3);expect(d.summary.currencies).toHaveLength(1) } finally { f.close() }
 })
+
+test("attach security and correlation headers to API responses",async()=>{
+ const f=await fixture()
+ try { const r=await f.request('/me');expect(r.headers.get('Cache-Control')).toBe('no-store');expect(r.headers.get('X-Content-Type-Options')).toBe('nosniff');expect(r.headers.get('Content-Security-Policy')).toContain("object-src 'none'");expect(r.headers.get('X-Request-Id')).toMatch(/^[a-f0-9-]{36}$/) } finally { f.close() }
+})
