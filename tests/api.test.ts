@@ -236,3 +236,8 @@ test("attach security and correlation headers to API responses",async()=>{
  const f=await fixture()
  try { const r=await f.request('/me');expect(r.headers.get('Cache-Control')).toBe('no-store');expect(r.headers.get('X-Content-Type-Options')).toBe('nosniff');expect(r.headers.get('Content-Security-Policy')).toContain("object-src 'none'");expect(r.headers.get('X-Request-Id')).toMatch(/^[a-f0-9-]{36}$/) } finally { f.close() }
 })
+
+test("reject cross-origin browser API requests",async()=>{
+ const f=await fixture()
+ try { const r=await f.app.fetch(new Request('http://localhost/api/me',{headers:{Authorization:'Bearer '+f.admin,Origin:'https://untrusted.example'}}),f.env);expect(r.status).toBe(403) } finally { f.close() }
+})
