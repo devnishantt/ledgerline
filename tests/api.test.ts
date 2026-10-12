@@ -241,3 +241,8 @@ test("reject cross-origin browser API requests",async()=>{
  const f=await fixture()
  try { const r=await f.app.fetch(new Request('http://localhost/api/me',{headers:{Authorization:'Bearer '+f.admin,Origin:'https://untrusted.example'}}),f.env);expect(r.status).toBe(403) } finally { f.close() }
 })
+
+test("persist and enforce the operator bootstrap request budget",async()=>{
+ const f=await fixture()
+ try { for(let i=0;i<4;i++)expect((await f.request('/workspaces','POST',{name:'Workspace '+i},operator)).status).toBe(201);const r=await f.request('/workspaces','POST',{name:'Rate limited'},operator);expect(r.status).toBe(429);expect(r.headers.get('Retry-After')).toBe('60') } finally { f.close() }
+})
