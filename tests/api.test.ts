@@ -129,7 +129,7 @@ test("reject invalid query pagination boundaries",async()=>{
 
 test("require rules to belong to the selected account",async()=>{
  const f=await prepared()
- try { const other=await f.account('USD','Other period');const rule=await f.json('/rules','POST',{accountId:other.id,name:'Other rule'});expect((await f.request('/runs','POST',{accountId:f.account.id,ruleId:rule.id,name:'Invalid run'})).status).toBe(404) } finally { f.close() }
+ try { const other=await f.json('/accounts','POST',{name:'Other period',currency:'USD'});const rule=await f.json('/rules','POST',{accountId:other.id,name:'Other rule'});expect((await f.request('/runs','POST',{accountId:f.account.id,ruleId:rule.id,name:'Invalid run'})).status).toBe(404) } finally { f.close() }
 })
 
 test("require both statement sources before matching",async()=>{
