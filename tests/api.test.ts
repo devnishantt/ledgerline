@@ -246,3 +246,8 @@ test("persist and enforce the operator bootstrap request budget",async()=>{
  const f=await fixture()
  try { for(let i=0;i<4;i++)expect((await f.request('/workspaces','POST',{name:'Workspace '+i},operator)).status).toBe(201);const r=await f.request('/workspaces','POST',{name:'Rate limited'},operator);expect(r.status).toBe(429);expect(r.headers.get('Retry-After')).toBe('60') } finally { f.close() }
 })
+
+test("sanitize unknown routes and injected storage failures",async()=>{
+ const f=await fixture()
+ try { expect((await f.request('/does-not-exist')).status).toBe(404);f.db.failAt=1;const r=await f.request('/accounts','POST',{name:'Fail atomically',currency:'USD'});expect(r.status).toBe(503);expect(await r.text()).not.toContain('Injected') } finally { f.close() }
+})
