@@ -17,6 +17,7 @@ export function createApp() {
   app.onError((error,c)=>{
     let status=503,code='STORAGE_UNAVAILABLE',message='Storage is temporarily unavailable'
     if(error instanceof Problem) {status=error.status;code=error.code;message=error.message}
+    else if(error instanceof RangeError) {status=422;code='REPORT_RANGE';message='Currency aggregate exceeds exact reporting range; use period-specific accounts'}
     else if(/UNIQUE constraint|constraint failed|capacity reached/i.test(error.message)) {status=409;code='WRITE_CONFLICT';message='Duplicate data or concurrent update; reload before retrying'}
     if(status===401)c.header('WWW-Authenticate','Bearer')
     return c.json({error:{code,message,requestId:c.get('requestId')}},status as 400)

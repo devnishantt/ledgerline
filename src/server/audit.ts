@@ -13,7 +13,7 @@ export async function mutate(db: Database,p: Principal,action: string,payload: u
   const workspace=await first<{revision:number;head_hash:string}>(db,'SELECT revision,head_hash FROM workspaces WHERE id=?',[p.workspaceId])
   ensure(workspace,404,'NOT_FOUND','Workspace not found')
   const next=workspace.revision+1, event=await auditOperation(p,next,workspace.head_hash,action,payload)
-  await batch(db,[{sql:'INSERT INTO workspace_revisions (workspace_id,revision) VALUES (?,?)',params:[p.workspaceId,next]},...operations,event.operation,{sql:'UPDATE workspaces SET revision=?,head_hash=? WHERE id=?',params:[next,event.hash,p.workspaceId]}])
+  await batch(db,[{sql:'INSERT INTO workspace_revisions (workspace_id,revision,actor_id) VALUES (?,?,?)',params:[p.workspaceId,next,p.id]},...operations,event.operation,{sql:'UPDATE workspaces SET revision=?,head_hash=? WHERE id=?',params:[next,event.hash,p.workspaceId]}])
 }
 export async function verifyAudit(db: Database,p: Principal) {
   const workspace=await first<{revision:number;head_hash:string}>(db,'SELECT revision,head_hash FROM workspaces WHERE id=?',[p.workspaceId])

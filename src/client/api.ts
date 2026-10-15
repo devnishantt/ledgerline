@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
+z.config({ jitless: true })
 const errorEnvelope=z.object({error:z.object({code:z.string(),message:z.string()})})
 import type { Match,Run,Transaction,Rule } from '../domain/types'
 let credential=''

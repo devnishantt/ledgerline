@@ -1,4 +1,6 @@
 import { z } from 'zod'
+// Edge runtimes and the browser CSP forbid dynamic code generation.
+z.config({ jitless: true })
 import { currencies } from './money'
 export const workspaceInput = z.strictObject({ name: z.string().trim().min(2).max(100) })
 export const accountInput = z.strictObject({ name: z.string().trim().min(2).max(100), currency: z.enum(currencies), institution: z.string().trim().max(100).default('') })

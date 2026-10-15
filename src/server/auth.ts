@@ -20,7 +20,7 @@ bootstrap.post('/',async c=>{
   const input=await body(c,workspaceInput),workspaceId=id(),keyId=id(),key=newKey(),created=now(),expires=new Date(Date.now()+30*86400000).toISOString()
   const p={id:keyId,workspaceId,role:'admin' as const,label:'Initial administrator'}
   const event=await auditOperation(p,0,GENESIS,'workspace.created',{name:input.name})
-  await batch(c.env.DB,[{sql:'INSERT INTO workspaces (id,name,head_hash,created_at) VALUES (?,?,?,?)',params:[workspaceId,input.name,event.hash,created]},{sql:'INSERT INTO workspace_revisions VALUES (?,0)',params:[workspaceId]},{sql:'INSERT INTO api_keys (id,workspace_id,label,role,digest,prefix,expires_at,created_at) VALUES (?,?,?,?,?,?,?,?)',params:[keyId,workspaceId,p.label,'admin',await digest(key),key.slice(0,11),expires,created]},event.operation])
+  await batch(c.env.DB,[{sql:'INSERT INTO workspaces (id,name,head_hash,created_at) VALUES (?,?,?,?)',params:[workspaceId,input.name,event.hash,created]},{sql:'INSERT INTO workspace_revisions (workspace_id,revision) VALUES (?,0)',params:[workspaceId]},{sql:'INSERT INTO api_keys (id,workspace_id,label,role,digest,prefix,expires_at,created_at) VALUES (?,?,?,?,?,?,?,?)',params:[keyId,workspaceId,p.label,'admin',await digest(key),key.slice(0,11),expires,created]},event.operation])
   return c.json({workspace:{id:workspaceId,name:input.name},apiKey:{id:keyId,key,expiresAt:expires}},201)
 })
 export const keys=new Hono<Env>()
