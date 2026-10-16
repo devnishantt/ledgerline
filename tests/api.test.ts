@@ -251,3 +251,55 @@ test("sanitize unknown routes and injected storage failures",async()=>{
  const f=await fixture()
  try { expect((await f.request('/does-not-exist')).status).toBe(404);f.db.failAt=1;const r=await f.request('/accounts','POST',{name:'Fail atomically',currency:'USD'});expect(r.status).toBe(503);expect(await r.text()).not.toContain('Injected') } finally { f.close() }
 })
+
+test('serialize competing review batches and preserve one revision winner',async()=>{
+ const f=await prepared()
+ try {
+  const base='/runs/'+f.detail.run.id+'/matches/'
+  const results=await Promise.all(f.detail.matches.slice(0,2).map((m:any)=>f.request(base+m.id,'POST',{expectedRevision:0,decision:'approved',note:'Concurrent independent review'},f.reviewer.key)))
+  expect(results.map(r=>r.status).sort()).toEqual([200,409])
+  const detail=await f.json('/runs/'+f.detail.run.id)
+  expect(detail.run.revision).toBe(1);expect(detail.summary.approved).toBe(1)
+  expect((await f.json('/audit/verify')).valid).toBe(true)
+ }finally{f.close()}
+})
+
+test('prevent direct mutation of normalized financial records',async()=>{
+ const f=await prepared()
+ try {
+  expect(()=>f.db.raw.exec('UPDATE transactions SET amount=0')).toThrow('immutable')
+  expect(()=>f.db.raw.exec('DELETE FROM transactions')).toThrow('immutable')
+  expect(()=>f.db.raw.exec("UPDATE imports SET filename='forged.csv'")).toThrow('immutable')
+ }finally{f.close()}
+})
+
+test('keep a run snapshot stable after later statement imports',async()=>{
+ const f=await prepared()
+ try {
+  await f.json('/imports','POST',{accountId:f.account.id,side:'bank',filename:'later.csv',csv:'date,amount,currency,description,external_id\n2026-10-10,20.00,USD,Later statement record,LATER-1'})
+  expect((await f.json('/transactions')).total).toBe(8)
+  expect((await f.json('/runs/'+f.detail.run.id)).transactions).toHaveLength(7)
+ }finally{f.close()}
+})
+
+test('guard the last active administrator even through direct SQL',async()=>{
+ const f=await fixture()
+ try {expect(()=>f.db.raw.query('UPDATE api_keys SET revoked_at=? WHERE id=?').run(new Date().toISOString(),f.workspace.apiKey.id)).toThrow('last active administrator')}
+ finally{f.close()}
+})
+
+test('recheck credential validity atomically at mutation time',async()=>{
+ const f=await fixture()
+ try {
+  const key=await f.key('reviewer')
+  expect((await f.request('/keys/'+key.id,'DELETE')).status).toBe(204)
+  const me=await f.json('/me')
+  const {mutate}=await import('../src/server/audit')
+  await expect(mutate(f.db,{...me.principal,id:key.id,role:'reviewer'},'test.revoked',{},[])).rejects.toThrow('active write identity')
+ }finally{f.close()}
+})
+
+test('reject bodies beyond the configured JSON byte budget',async()=>{
+ const f=await fixture()
+ try {expect((await f.request('/accounts','POST',{name:'x'.repeat(256001),currency:'USD'})).status).toBe(413)}finally{f.close()}
+})

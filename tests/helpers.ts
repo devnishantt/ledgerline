@@ -7,6 +7,7 @@ import { sampleBank,sampleLedger } from '../src/client/sample'
 export class TestDatabase implements Database {
  readonly raw=new SQLite(':memory:')
  failAt=-1
+ private gate:Promise<void>=Promise.resolve()
  constructor(){this.raw.exec('PRAGMA foreign_keys=ON');for(const file of readdirSync(new URL('../migrations/',import.meta.url)).filter(x=>x.endsWith('.sql')).sort())this.raw.exec(readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8'))}
  prepare(sql:string):Statement {
   const create=(params:Value[]):Statement=>({bind:(...values)=>create(values),first:async<T>()=>(this.raw.query(sql).get(...params)??null) as T|null,all:async<T>()=>({results:this.raw.query(sql).all(...params) as T[]}),run:async()=>this.raw.query(sql).run(...params)})
@@ -14,10 +15,15 @@ export class TestDatabase implements Database {
   return Object.assign(statement,{_sql:sql,_params:[]})
  }
  async batch(statements:Statement[]):Promise<unknown[]> {
+  const prior=this.gate
+  let release!:()=>void
+  this.gate=new Promise<void>(resolve=>{release=resolve})
+  await prior
   const results:unknown[]=[]
   this.raw.exec('BEGIN')
   try {for(let i=0;i<statements.length;i++){if(this.failAt===i){this.failAt=-1;throw new Error('Injected batch failure')}results.push(await statements[i].run())}this.raw.exec('COMMIT');return results}
   catch(error){this.raw.exec('ROLLBACK');throw error}
+  finally{release()}
  }
  close(){this.raw.close()}
 }

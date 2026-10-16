@@ -26,3 +26,7 @@ test("bucket ageing at the seven and thirty day boundaries", async()=>{
 test("handle empty reports and reject malformed ageing inputs", async()=>{
   expect(summarize([],[])).toMatchObject({transactions:0,unmatched:0,currencies:[]});expect(()=>ageing('bad','2026-10-01')).toThrow('Invalid')
 })
+
+test('fail explicitly instead of rounding unsafe currency aggregates',()=>{
+ expect(()=>summarize([transaction({amount:Number.MAX_SAFE_INTEGER}),transaction({id:'overflow',amount:1})],[])).toThrow('exact reporting range')
+})
