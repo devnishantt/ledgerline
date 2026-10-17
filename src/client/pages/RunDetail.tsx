@@ -1,15 +1,283 @@
-import { useState } from 'react'
-import { ArrowLeft,Download,ShieldCheck } from 'lucide-react'
-import { download,post,useApi,type Detail } from '../api'
-import type { Match } from '../../domain/types'
-import { formatMoney } from '../../domain/money'
-import { Badge,Card,ErrorNotice,Feedback,Loading,Metric,PageHeader,useAction } from '../components/ui'
-import { DataTable } from '../components/DataTable'
-export function RunDetail({id,role}:{id:string;role:string}){
- const q=useApi<Detail>('/runs/'+id),action=useAction(),[selected,setSelected]=useState<Match|null>(null),[note,setNote]=useState('')
- if(q.isPending)return <Loading/>;if(q.error||!q.data)return <ErrorNotice error={q.error}/>
- const {run,transactions,matches,summary}=q.data,byId=new Map(transactions.map(t=>[t.id,t])),approvedIds=new Set(matches.filter(m=>m.status==='approved').flatMap(m=>[m.bank_id,m.ledger_id]))
- const unresolved=transactions.filter(t=>!approvedIds.has(t.id))
- const decide=(decision:string)=>void action.run(async()=>{await post(`/runs/${id}/matches/${selected!.id}`,{expectedRevision:run.revision,decision,note});setSelected(null);setNote('')},'Review decision recorded.')
- return <><a href="#runs" className="back-link"><ArrowLeft size={15}/>All reconciliations</a><PageHeader eyebrow={'RECONCILIATION · REVISION '+run.revision} title={run.name} description="Decisions are immutable. Unmatched rows remain visible even after finalization." action={<button className="button secondary" disabled={action.busy} onClick={()=>void action.run(()=>download(`/runs/${id}/export`,`ledgerline-${id}.csv`),'Export downloaded.')}><Download size={16}/>Export CSV</button>}/><section className="metrics-grid"><Metric label="Statement rows" value={summary.transactions} detail="Frozen at run creation"/><Metric label="Approved pairs" value={summary.approved} detail="Independent review completed" accent/><Metric label="Pending decisions" value={summary.proposed} detail="Must be zero before finalization"/><Metric label="Unresolved rows" value={summary.unmatched} detail="Includes rejected or ambiguous pairs"/></section><Feedback action={action}/><section className="info-strip"><ShieldCheck size={20}/><p><strong>{run.status==='finalized'?'Finalized review record.':'Independent review required.'}</strong> {run.status==='finalized'?'Finalized does not mean every statement row is reconciled. See unresolved rows below.':'The creator cannot review their own proposals. A distinct reviewer credential must approve or reject each pair.'}</p><Badge tone={run.status==='finalized'?'green':'amber'}>{run.status}</Badge></section>{selected&&<Card title="Record a review decision" action={<button className="text-button" onClick={()=>setSelected(null)}>Cancel</button>}><p>Bank: {byId.get(selected.bank_id)?.description} ↔ Ledger: {byId.get(selected.ledger_id)?.description}</p><p className="muted">{selected.reason}</p><label>Review rationale<textarea minLength={5} maxLength={1000} rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Explain why these two records do or do not reconcile."/></label><section className="form-actions"><button className="button primary" disabled={action.busy||note.trim().length<5} onClick={()=>decide('approved')}>Approve pair</button><button className="button danger" disabled={action.busy||note.trim().length<5} onClick={()=>decide('rejected')}>Reject pair</button></section></Card>}<Card title="Match proposals"><DataTable rows={matches} columns={[{id:'bank',header:'Bank record',cell:({row})=><section className="cell-record"><strong>{byId.get(row.original.bank_id)?.description}</strong><small>{byId.get(row.original.bank_id)?.reference}</small></section>},{id:'ledger',header:'Ledger record',cell:({row})=><section className="cell-record"><strong>{byId.get(row.original.ledger_id)?.description}</strong><small>{byId.get(row.original.ledger_id)?.reference}</small></section>},{accessorKey:'score',header:'Score',cell:({getValue})=><Badge tone="green">{getValue() as number}/100</Badge>},{accessorKey:'variance',header:'Variance',cell:({row})=>formatMoney(row.original.variance,byId.get(row.original.bank_id)!.currency)},{accessorKey:'status',header:'Decision',cell:({getValue})=><Badge tone={getValue()==='approved'?'green':getValue()==='rejected'?'red':'amber'}>{getValue() as string}</Badge>},{id:'action',header:'Review',cell:({row})=>row.original.status==='proposed'&&run.status==='review'&&role!=='viewer'?<button className="button compact secondary" onClick={()=>{setSelected(row.original);setNote('')}}>Review pair</button>:<small>{row.original.note||'—'}</small>}]}/></Card><Card title={`Unresolved statement rows · ${unresolved.length}`}><DataTable rows={unresolved} columns={[{accessorKey:'date',header:'Date'},{accessorKey:'side',header:'Side'},{accessorKey:'description',header:'Description'},{accessorKey:'reference',header:'Reference'},{id:'amount',header:'Amount',cell:({row})=>formatMoney(row.original.amount,row.original.currency)}]}/></Card>{role==='admin'&&run.status==='review'&&<Card title="Finalize review"><p className="muted">Finalization locks this run. It requires all proposals reviewed and at least one approved pair. Unresolved rows are not silently written off.</p><button className="button primary" disabled={action.busy||summary.proposed>0||summary.approved===0} onClick={()=>{if(window.confirm('Finalize this review record? Decisions cannot be changed.'))void action.run(()=>post(`/runs/${id}/finalize`,{expectedRevision:run.revision}),'Review finalized.')}}>Finalize review record</button></Card>}</>
+import { useState } from "react";
+import { ArrowLeft, Download, ShieldCheck } from "lucide-react";
+import { download, post, useApi, type Detail } from "../api";
+import type { Match } from "../../domain/types";
+import { formatMoney } from "../../domain/money";
+import {
+  Badge,
+  Card,
+  ErrorNotice,
+  Feedback,
+  Loading,
+  Metric,
+  PageHeader,
+  useAction,
+} from "../components/ui";
+import { DataTable } from "../components/DataTable";
+export function RunDetail({ id, role }: { id: string; role: string }) {
+  const q = useApi<Detail>("/runs/" + id),
+    action = useAction(),
+    [selected, setSelected] = useState<Match | null>(null),
+    [note, setNote] = useState("");
+  if (q.isPending) return <Loading />;
+  if (q.error || !q.data) return <ErrorNotice error={q.error} />;
+  const { run, transactions, matches, summary } = q.data,
+    byId = new Map(transactions.map((t) => [t.id, t])),
+    approvedIds = new Set(
+      matches
+        .filter((m) => m.status === "approved")
+        .flatMap((m) => [m.bank_id, m.ledger_id]),
+    );
+  const unresolved = transactions.filter((t) => !approvedIds.has(t.id));
+  const decide = (decision: string) =>
+    void action.run(async () => {
+      await post(`/runs/${id}/matches/${selected!.id}`, {
+        expectedRevision: run.revision,
+        decision,
+        note,
+      });
+      setSelected(null);
+      setNote("");
+    }, "Review decision recorded.");
+  return (
+    <>
+      <a href="#runs" className="back-link">
+        <ArrowLeft size={15} />
+        All reconciliations
+      </a>
+      <PageHeader
+        eyebrow={"RECONCILIATION · REVISION " + run.revision}
+        title={run.name}
+        description="Decisions are immutable. Unmatched rows remain visible even after finalization."
+        action={
+          <button
+            className="button secondary"
+            disabled={action.busy}
+            onClick={() =>
+              void action.run(
+                () => download(`/runs/${id}/export`, `ledgerline-${id}.csv`),
+                "Export downloaded.",
+              )
+            }
+          >
+            <Download size={16} />
+            Export CSV
+          </button>
+        }
+      />
+      <section className="metrics-grid">
+        <Metric
+          label="Statement rows"
+          value={summary.transactions}
+          detail="Frozen at run creation"
+        />
+        <Metric
+          label="Approved pairs"
+          value={summary.approved}
+          detail="Independent review completed"
+          accent
+        />
+        <Metric
+          label="Pending decisions"
+          value={summary.proposed}
+          detail="Must be zero before finalization"
+        />
+        <Metric
+          label="Unresolved rows"
+          value={summary.unmatched}
+          detail="Includes rejected or ambiguous pairs"
+        />
+      </section>
+      <Feedback action={action} />
+      <section className="info-strip">
+        <ShieldCheck size={20} />
+        <p>
+          <strong>
+            {run.status === "finalized"
+              ? "Finalized review record."
+              : "Independent review required."}
+          </strong>{" "}
+          {run.status === "finalized"
+            ? "Finalized does not mean every statement row is reconciled. See unresolved rows below."
+            : "The creator cannot review their own proposals. A distinct reviewer credential must approve or reject each pair."}
+        </p>
+        <Badge tone={run.status === "finalized" ? "green" : "amber"}>
+          {run.status}
+        </Badge>
+      </section>
+      {selected && (
+        <Card
+          title="Record a review decision"
+          action={
+            <button className="text-button" onClick={() => setSelected(null)}>
+              Cancel
+            </button>
+          }
+        >
+          <p>
+            Bank: {byId.get(selected.bank_id)?.description} ↔ Ledger:{" "}
+            {byId.get(selected.ledger_id)?.description}
+          </p>
+          <p className="muted">{selected.reason}</p>
+          <label>
+            Review rationale
+            <textarea
+              minLength={5}
+              maxLength={1000}
+              rows={3}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Explain why these two records do or do not reconcile."
+            />
+          </label>
+          <section className="form-actions">
+            <button
+              className="button primary"
+              disabled={action.busy || note.trim().length < 5}
+              onClick={() => decide("approved")}
+            >
+              Approve pair
+            </button>
+            <button
+              className="button danger"
+              disabled={action.busy || note.trim().length < 5}
+              onClick={() => decide("rejected")}
+            >
+              Reject pair
+            </button>
+          </section>
+        </Card>
+      )}
+      <Card title="Match proposals">
+        <DataTable
+          rows={matches}
+          columns={[
+            {
+              id: "bank",
+              header: "Bank record",
+              cell: ({ row }) => (
+                <section className="cell-record">
+                  <strong>{byId.get(row.original.bank_id)?.description}</strong>
+                  <small>{byId.get(row.original.bank_id)?.reference}</small>
+                </section>
+              ),
+            },
+            {
+              id: "ledger",
+              header: "Ledger record",
+              cell: ({ row }) => (
+                <section className="cell-record">
+                  <strong>
+                    {byId.get(row.original.ledger_id)?.description}
+                  </strong>
+                  <small>{byId.get(row.original.ledger_id)?.reference}</small>
+                </section>
+              ),
+            },
+            {
+              accessorKey: "score",
+              header: "Score",
+              cell: ({ getValue }) => (
+                <Badge tone="green">{getValue() as number}/100</Badge>
+              ),
+            },
+            {
+              accessorKey: "variance",
+              header: "Variance",
+              cell: ({ row }) =>
+                formatMoney(
+                  row.original.variance,
+                  byId.get(row.original.bank_id)!.currency,
+                ),
+            },
+            {
+              accessorKey: "status",
+              header: "Decision",
+              cell: ({ getValue }) => (
+                <Badge
+                  tone={
+                    getValue() === "approved"
+                      ? "green"
+                      : getValue() === "rejected"
+                        ? "red"
+                        : "amber"
+                  }
+                >
+                  {getValue() as string}
+                </Badge>
+              ),
+            },
+            {
+              id: "action",
+              header: "Review",
+              cell: ({ row }) =>
+                row.original.status === "proposed" &&
+                run.status === "review" &&
+                role !== "viewer" ? (
+                  <button
+                    className="button compact secondary"
+                    onClick={() => {
+                      setSelected(row.original);
+                      setNote("");
+                    }}
+                  >
+                    Review pair
+                  </button>
+                ) : (
+                  <small>{row.original.note || "—"}</small>
+                ),
+            },
+          ]}
+        />
+      </Card>
+      <Card title={`Unresolved statement rows · ${unresolved.length}`}>
+        <DataTable
+          rows={unresolved}
+          columns={[
+            { accessorKey: "date", header: "Date" },
+            { accessorKey: "side", header: "Side" },
+            { accessorKey: "description", header: "Description" },
+            { accessorKey: "reference", header: "Reference" },
+            {
+              id: "amount",
+              header: "Amount",
+              cell: ({ row }) =>
+                formatMoney(row.original.amount, row.original.currency),
+            },
+          ]}
+        />
+      </Card>
+      {role === "admin" && run.status === "review" && (
+        <Card title="Finalize review">
+          <p className="muted">
+            Finalization locks this run. It requires all proposals reviewed and
+            at least one approved pair. Unresolved rows are not silently written
+            off.
+          </p>
+          <button
+            className="button primary"
+            disabled={
+              action.busy || summary.proposed > 0 || summary.approved === 0
+            }
+            onClick={() => {
+              if (
+                window.confirm(
+                  "Finalize this review record? Decisions cannot be changed.",
+                )
+              )
+                void action.run(
+                  () =>
+                    post(`/runs/${id}/finalize`, {
+                      expectedRevision: run.revision,
+                    }),
+                  "Review finalized.",
+                );
+            }}
+          >
+            Finalize review record
+          </button>
+        </Card>
+      )}
+    </>
+  );
 }

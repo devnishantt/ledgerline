@@ -1,10 +1,163 @@
-import { useState } from 'react'
-import { Plus,SlidersHorizontal } from 'lucide-react'
-import { post,useApi,type Account,type RuleRow } from '../api'
-import { Badge,Card,ErrorNotice,Feedback,PageHeader,Submit,useAction } from '../components/ui'
-import { DataTable } from '../components/DataTable'
-export function Rules({admin}:{admin:boolean}){
- const q=useApi<{items:RuleRow[]}>('/rules'),accounts=useApi<{items:Account[]}>('/accounts'),action=useAction()
- const [show,setShow]=useState(false),[accountId,setAccount]=useState(''),[name,setName]=useState(''),[tolerance,setTolerance]=useState(0),[dateWindow,setWindow]=useState(3),[referenceMode,setMode]=useState('prefer'),[minScore,setScore]=useState(75)
- return <><PageHeader eyebrow="EXPLAINABLE BY DESIGN" title="Matching rules" description="Control how candidates are scored. Equal best candidates stay unresolved." action={admin&&<button className="button primary" onClick={()=>setShow(!show)}><Plus size={16}/>Create rule</button>}/>{show&&<Card title="New matching policy"><form onSubmit={e=>{e.preventDefault();void action.run(async()=>{await post('/rules',{accountId,name,tolerance,dateWindow,referenceMode,minScore});setShow(false)})}}><section className="form-grid"><label>Account<select required value={accountId} onChange={e=>setAccount(e.target.value)}><option value="">Select account</option>{accounts.data?.items.map(a=><option key={a.id} value={a.id}>{a.name} · {a.currency}</option>)}</select></label><label>Policy name<input required minLength={2} maxLength={100} value={name} onChange={e=>setName(e.target.value)} placeholder="Exact references with settlement window"/></label><label>Amount tolerance (minor units)<input type="number" min={0} max={10000} required value={tolerance} onChange={e=>setTolerance(Number(e.target.value))}/><small>100 minor units = USD 1.00; JPY has no decimals.</small></label><label>Date window (days)<input type="number" min={0} max={14} required value={dateWindow} onChange={e=>setWindow(Number(e.target.value))}/></label><label>Reference matching<select value={referenceMode} onChange={e=>setMode(e.target.value)}><option value="prefer">Prefer aligned references</option><option value="require">Require aligned references</option><option value="ignore">Ignore references</option></select></label><label>Minimum score<input type="number" min={40} max={100} required value={minScore} onChange={e=>setScore(Number(e.target.value))}/></label></section><Submit busy={action.busy}>Save policy</Submit></form></Card>}<Feedback action={action}/><ErrorNotice error={q.error??accounts.error}/><Card title="Saved matching policies"><DataTable rows={q.data?.items??[]} columns={[{accessorKey:'name',header:'Policy'},{accessorKey:'account_name',header:'Account'},{accessorKey:'tolerance',header:'Tolerance (minor)'},{accessorKey:'date_window',header:'Days'},{accessorKey:'reference_mode',header:'Reference',cell:({getValue})=><Badge>{getValue() as string}</Badge>},{accessorKey:'min_score',header:'Minimum score'}]}/></Card><section className="info-strip"><SlidersHorizontal size={20}/><p><strong>No rule is a sign-off.</strong> Scores explain why rows might match. Independent reviewers make the approval decision.</p></section></>
+import { useState } from "react";
+import { Plus, SlidersHorizontal } from "lucide-react";
+import { post, useApi, type Account, type RuleRow } from "../api";
+import {
+  Badge,
+  Card,
+  ErrorNotice,
+  Feedback,
+  PageHeader,
+  Submit,
+  useAction,
+} from "../components/ui";
+import { DataTable } from "../components/DataTable";
+export function Rules({ admin }: { admin: boolean }) {
+  const q = useApi<{ items: RuleRow[] }>("/rules"),
+    accounts = useApi<{ items: Account[] }>("/accounts"),
+    action = useAction();
+  const [show, setShow] = useState(false),
+    [accountId, setAccount] = useState(""),
+    [name, setName] = useState(""),
+    [tolerance, setTolerance] = useState(0),
+    [dateWindow, setWindow] = useState(3),
+    [referenceMode, setMode] = useState("prefer"),
+    [minScore, setScore] = useState(75);
+  return (
+    <>
+      <PageHeader
+        eyebrow="EXPLAINABLE BY DESIGN"
+        title="Matching rules"
+        description="Control how candidates are scored. Equal best candidates stay unresolved."
+        action={
+          admin && (
+            <button className="button primary" onClick={() => setShow(!show)}>
+              <Plus size={16} />
+              Create rule
+            </button>
+          )
+        }
+      />
+      {show && (
+        <Card title="New matching policy">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void action.run(async () => {
+                await post("/rules", {
+                  accountId,
+                  name,
+                  tolerance,
+                  dateWindow,
+                  referenceMode,
+                  minScore,
+                });
+                setShow(false);
+              });
+            }}
+          >
+            <section className="form-grid">
+              <label>
+                Account
+                <select
+                  required
+                  value={accountId}
+                  onChange={(e) => setAccount(e.target.value)}
+                >
+                  <option value="">Select account</option>
+                  {accounts.data?.items.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.name} · {a.currency}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Policy name
+                <input
+                  required
+                  minLength={2}
+                  maxLength={100}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Exact references with settlement window"
+                />
+              </label>
+              <label>
+                Amount tolerance (minor units)
+                <input
+                  type="number"
+                  min={0}
+                  max={10000}
+                  required
+                  value={tolerance}
+                  onChange={(e) => setTolerance(Number(e.target.value))}
+                />
+                <small>100 minor units = USD 1.00; JPY has no decimals.</small>
+              </label>
+              <label>
+                Date window (days)
+                <input
+                  type="number"
+                  min={0}
+                  max={14}
+                  required
+                  value={dateWindow}
+                  onChange={(e) => setWindow(Number(e.target.value))}
+                />
+              </label>
+              <label>
+                Reference matching
+                <select
+                  value={referenceMode}
+                  onChange={(e) => setMode(e.target.value)}
+                >
+                  <option value="prefer">Prefer aligned references</option>
+                  <option value="require">Require aligned references</option>
+                  <option value="ignore">Ignore references</option>
+                </select>
+              </label>
+              <label>
+                Minimum score
+                <input
+                  type="number"
+                  min={40}
+                  max={100}
+                  required
+                  value={minScore}
+                  onChange={(e) => setScore(Number(e.target.value))}
+                />
+              </label>
+            </section>
+            <Submit busy={action.busy}>Save policy</Submit>
+          </form>
+        </Card>
+      )}
+      <Feedback action={action} />
+      <ErrorNotice error={q.error ?? accounts.error} />
+      <Card title="Saved matching policies">
+        <DataTable
+          rows={q.data?.items ?? []}
+          columns={[
+            { accessorKey: "name", header: "Policy" },
+            { accessorKey: "account_name", header: "Account" },
+            { accessorKey: "tolerance", header: "Tolerance (minor)" },
+            { accessorKey: "date_window", header: "Days" },
+            {
+              accessorKey: "reference_mode",
+              header: "Reference",
+              cell: ({ getValue }) => <Badge>{getValue() as string}</Badge>,
+            },
+            { accessorKey: "min_score", header: "Minimum score" },
+          ]}
+        />
+      </Card>
+      <section className="info-strip">
+        <SlidersHorizontal size={20} />
+        <p>
+          <strong>No rule is a sign-off.</strong> Scores explain why rows might
+          match. Independent reviewers make the approval decision.
+        </p>
+      </section>
+    </>
+  );
 }

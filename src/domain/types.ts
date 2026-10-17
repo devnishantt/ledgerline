@@ -1,9 +1,70 @@
-import type { Currency } from './money'
-export type Role = 'admin' | 'reviewer' | 'viewer'
-export type Side = 'bank' | 'ledger'
-export type Transaction = { id: string; workspace_id: string; account_id: string; import_id: string; side: Side; date: string; amount: number; currency: Currency; description: string; reference: string; external_id: string; fingerprint: string; created_at: string }
-export type Rule = { id: string; workspace_id: string; account_id: string; name: string; tolerance: number; date_window: number; reference_mode: 'prefer'|'require'|'ignore'; min_score: number; enabled: number; created_at: string }
-export type Candidate = { bankId: string; ledgerId: string; score: number; variance: number; reason: string; ambiguous: boolean }
-export type Principal = { id: string; workspaceId: string; role: Role; label: string }
-export type Run = { id: string; workspace_id: string; account_id: string; rule_id: string; name: string; status: 'review'|'finalized'; revision: number; created_by: string; created_at: string; finalized_at: string|null }
-export type Match = { id: string; workspace_id: string; run_id: string; bank_id: string; ledger_id: string; score: number; variance: number; reason: string; status: 'proposed'|'approved'|'rejected'; note: string; reviewed_by: string|null; reviewed_at: string|null }
+import type { Currency } from "./money";
+export type Role = "admin" | "reviewer" | "viewer";
+export type Side = "bank" | "ledger";
+export type Transaction = {
+  id: string;
+  workspace_id: string;
+  account_id: string;
+  import_id: string;
+  side: Side;
+  date: string;
+  amount: number;
+  currency: Currency;
+  description: string;
+  reference: string;
+  external_id: string;
+  fingerprint: string;
+  created_at: string;
+};
+export type Rule = {
+  id: string;
+  workspace_id: string;
+  account_id: string;
+  name: string;
+  tolerance: number;
+  date_window: number;
+  reference_mode: "prefer" | "require" | "ignore";
+  min_score: number;
+  enabled: number;
+  created_at: string;
+};
+export type Candidate = {
+  bankId: string;
+  ledgerId: string;
+  score: number;
+  variance: number;
+  reason: string;
+  ambiguous: boolean;
+};
+export type Principal = {
+  id: string;
+  workspaceId: string;
+  role: Role;
+  label: string;
+};
+export type Run = {
+  id: string;
+  workspace_id: string;
+  account_id: string;
+  rule_id: string;
+  name: string;
+  status: "review" | "finalized";
+  revision: number;
+  created_by: string;
+  created_at: string;
+  finalized_at: string | null;
+};
+export type Match = {
+  id: string;
+  workspace_id: string;
+  run_id: string;
+  bank_id: string;
+  ledger_id: string;
+  score: number;
+  variance: number;
+  reason: string;
+  status: "proposed" | "approved" | "rejected";
+  note: string;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+};

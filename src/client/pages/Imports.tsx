@@ -1,14 +1,202 @@
-import { useState } from 'react'
-import { FileUp,FileSpreadsheet } from 'lucide-react'
-import { post,useApi,type Account } from '../api'
-import { sampleBank,sampleLedger,csvTemplate } from '../sample'
-import { Card,ErrorNotice,Feedback,PageHeader,Submit,useAction } from '../components/ui'
-import { DataTable } from '../components/DataTable'
-import { formatMoney } from '../../domain/money'
-export function Imports({admin}:{admin:boolean}){
- const accounts=useApi<{items:Account[]}>('/accounts'),history=useApi<{items:any[]}>('/imports'),action=useAction()
- const [accountId,setAccount]=useState(''),[side,setSide]=useState('bank'),[filename,setFilename]=useState('statement.csv'),[csv,setCsv]=useState(''),[preview,setPreview]=useState<any[]|null>(null)
- const input={accountId,side,filename,csv}
- async function loadFile(file?:File){if(!file)return;if(file.size>200000){void action.run(async()=>{throw new Error('Choose a CSV below 200 KB')});return}setFilename(file.name);setCsv(await file.text());setPreview(null)}
- return <><PageHeader eyebrow="BRING BOTH SIDES TOGETHER" title="Statement imports" description="Validate CSV records before committing an immutable, deduplicated import."/>{admin&&<Card title="Import a statement"><form onSubmit={e=>{e.preventDefault();void action.run(async()=>{const data=await post('/imports/preview',input);setPreview(data.rows)},'Statement validated — review the rows, then commit.')}}><section className="form-grid"><label>Account<select required value={accountId} onChange={e=>{setAccount(e.target.value);setPreview(null)}}><option value="">Choose an account</option>{accounts.data?.items.map(a=><option key={a.id} value={a.id}>{a.name} · {a.currency}</option>)}</select></label><label>Statement side<select value={side} onChange={e=>{setSide(e.target.value);setPreview(null)}}><option value="bank">Bank statement</option><option value="ledger">Ledger statement</option></select></label><label>File name<input required value={filename} onChange={e=>{setFilename(e.target.value);setPreview(null)}} maxLength={100}/></label><label className="file-picker"><FileUp size={18}/>Choose CSV file<input type="file" accept=".csv,text/csv" onChange={e=>void loadFile(e.target.files?.[0])}/></label></section><label>CSV content<textarea required rows={9} value={csv} placeholder={csvTemplate} spellCheck={false} onChange={e=>{setCsv(e.target.value);setPreview(null)}}/></label><section className="form-actions"><Submit busy={action.busy}>Validate statement</Submit><button type="button" className="button secondary" onClick={()=>{setCsv(side==='bank'?sampleBank:sampleLedger);setFilename(`example-${side}.csv`);setPreview(null)}}><FileSpreadsheet size={16}/>Use illustrative USD sample</button><small>1–200 rows · exact decimals · UTF-8 CSV</small></section></form></Card>}<Feedback action={action}/><ErrorNotice error={accounts.error??history.error}/>{preview&&<Card title={`Validated preview · ${preview.length} rows`} action={<button className="button primary" disabled={action.busy} onClick={()=>void action.run(async()=>{await post('/imports',input);setPreview(null);setCsv('')},'Statement imported and audit event recorded.')}>Commit import</button>}><DataTable rows={preview} columns={[{accessorKey:'date',header:'Date'},{accessorKey:'description',header:'Description'},{accessorKey:'reference',header:'Reference'},{id:'amount',header:'Amount',cell:({row})=>formatMoney(row.original.amount,row.original.currency)}]}/></Card>}<Card title="Import history"><DataTable rows={history.data?.items??[]} columns={[{accessorKey:'filename',header:'Statement'},{accessorKey:'account_name',header:'Account'},{accessorKey:'side',header:'Side'},{accessorKey:'row_count',header:'Rows'},{id:'time',header:'Imported',cell:({row})=>new Date(row.original.created_at).toLocaleString()}]}/></Card><p className="footnote">Sample records are illustrative, not live financial data. Duplicate files, fingerprints, and external IDs are rejected atomically.</p></>
+import { useState } from "react";
+import { FileUp, FileSpreadsheet } from "lucide-react";
+import { post, useApi, type Account } from "../api";
+import { sampleBank, sampleLedger, csvTemplate } from "../sample";
+import {
+  Card,
+  ErrorNotice,
+  Feedback,
+  PageHeader,
+  Submit,
+  useAction,
+} from "../components/ui";
+import { DataTable } from "../components/DataTable";
+import { formatMoney } from "../../domain/money";
+export function Imports({ admin }: { admin: boolean }) {
+  const accounts = useApi<{ items: Account[] }>("/accounts"),
+    history = useApi<{ items: any[] }>("/imports"),
+    action = useAction();
+  const [accountId, setAccount] = useState(""),
+    [side, setSide] = useState("bank"),
+    [filename, setFilename] = useState("statement.csv"),
+    [csv, setCsv] = useState(""),
+    [preview, setPreview] = useState<any[] | null>(null);
+  const input = { accountId, side, filename, csv };
+  async function loadFile(file?: File) {
+    if (!file) return;
+    if (file.size > 200000) {
+      void action.run(async () => {
+        throw new Error("Choose a CSV below 200 KB");
+      });
+      return;
+    }
+    setFilename(file.name);
+    setCsv(await file.text());
+    setPreview(null);
+  }
+  return (
+    <>
+      <PageHeader
+        eyebrow="BRING BOTH SIDES TOGETHER"
+        title="Statement imports"
+        description="Validate CSV records before committing an immutable, deduplicated import."
+      />
+      {admin && (
+        <Card title="Import a statement">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void action.run(async () => {
+                const data = await post("/imports/preview", input);
+                setPreview(data.rows);
+              }, "Statement validated — review the rows, then commit.");
+            }}
+          >
+            <section className="form-grid">
+              <label>
+                Account
+                <select
+                  required
+                  value={accountId}
+                  onChange={(e) => {
+                    setAccount(e.target.value);
+                    setPreview(null);
+                  }}
+                >
+                  <option value="">Choose an account</option>
+                  {accounts.data?.items.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.name} · {a.currency}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Statement side
+                <select
+                  value={side}
+                  onChange={(e) => {
+                    setSide(e.target.value);
+                    setPreview(null);
+                  }}
+                >
+                  <option value="bank">Bank statement</option>
+                  <option value="ledger">Ledger statement</option>
+                </select>
+              </label>
+              <label>
+                File name
+                <input
+                  required
+                  value={filename}
+                  onChange={(e) => {
+                    setFilename(e.target.value);
+                    setPreview(null);
+                  }}
+                  maxLength={100}
+                />
+              </label>
+              <label className="file-picker">
+                <FileUp size={18} />
+                Choose CSV file
+                <input
+                  type="file"
+                  accept=".csv,text/csv"
+                  onChange={(e) => void loadFile(e.target.files?.[0])}
+                />
+              </label>
+            </section>
+            <label>
+              CSV content
+              <textarea
+                required
+                rows={9}
+                value={csv}
+                placeholder={csvTemplate}
+                spellCheck={false}
+                onChange={(e) => {
+                  setCsv(e.target.value);
+                  setPreview(null);
+                }}
+              />
+            </label>
+            <section className="form-actions">
+              <Submit busy={action.busy}>Validate statement</Submit>
+              <button
+                type="button"
+                className="button secondary"
+                onClick={() => {
+                  setCsv(side === "bank" ? sampleBank : sampleLedger);
+                  setFilename(`example-${side}.csv`);
+                  setPreview(null);
+                }}
+              >
+                <FileSpreadsheet size={16} />
+                Use illustrative USD sample
+              </button>
+              <small>1–200 rows · exact decimals · UTF-8 CSV</small>
+            </section>
+          </form>
+        </Card>
+      )}
+      <Feedback action={action} />
+      <ErrorNotice error={accounts.error ?? history.error} />
+      {preview && (
+        <Card
+          title={`Validated preview · ${preview.length} rows`}
+          action={
+            <button
+              className="button primary"
+              disabled={action.busy}
+              onClick={() =>
+                void action.run(async () => {
+                  await post("/imports", input);
+                  setPreview(null);
+                  setCsv("");
+                }, "Statement imported and audit event recorded.")
+              }
+            >
+              Commit import
+            </button>
+          }
+        >
+          <DataTable
+            rows={preview}
+            columns={[
+              { accessorKey: "date", header: "Date" },
+              { accessorKey: "description", header: "Description" },
+              { accessorKey: "reference", header: "Reference" },
+              {
+                id: "amount",
+                header: "Amount",
+                cell: ({ row }) =>
+                  formatMoney(row.original.amount, row.original.currency),
+              },
+            ]}
+          />
+        </Card>
+      )}
+      <Card title="Import history">
+        <DataTable
+          rows={history.data?.items ?? []}
+          columns={[
+            { accessorKey: "filename", header: "Statement" },
+            { accessorKey: "account_name", header: "Account" },
+            { accessorKey: "side", header: "Side" },
+            { accessorKey: "row_count", header: "Rows" },
+            {
+              id: "time",
+              header: "Imported",
+              cell: ({ row }) =>
+                new Date(row.original.created_at).toLocaleString(),
+            },
+          ]}
+        />
+      </Card>
+      <p className="footnote">
+        Sample records are illustrative, not live financial data. Duplicate
+        files, fingerprints, and external IDs are rejected atomically.
+      </p>
+    </>
+  );
 }

@@ -1,7 +1,123 @@
-import type { ReactNode } from 'react'
-import { LayoutDashboard,Landmark,ArrowDownToLine,ArrowLeftRight,SlidersHorizontal,GitCompareArrows,ShieldCheck,KeyRound,LogOut,ChevronRight,ExternalLink } from 'lucide-react'
-const links=[['overview','Overview',LayoutDashboard],['accounts','Accounts',Landmark],['imports','Statement imports',ArrowDownToLine],['transactions','Transactions',ArrowLeftRight],['rules','Matching rules',SlidersHorizontal],['runs','Reconciliation',GitCompareArrows],['audit','Audit trail',ShieldCheck],['keys','Access & keys',KeyRound]] as const
-export function Logo(){return <span className="brand"><span className="brand-mark">ll<span/></span>ledgerline<span className="brand-dot">.</span></span>}
-export function Shell({page,workspace,role,onSignOut,children}:{page:string;workspace:string;role:string;onSignOut:()=>void;children:ReactNode}){
-  return <div className="workspace-shell"><aside className="sidebar"><a className="brand-link" href="#overview"><Logo/></a><section className="workspace-switch"><span className="workspace-avatar">{workspace.slice(0,2).toUpperCase()}</span><span><strong>{workspace}</strong><small>Finance workspace</small></span><ChevronRight size={14}/></section><p className="nav-label">WORKSPACE</p><nav aria-label="Workspace navigation">{links.map(([id,label,Icon])=><a key={id} href={'#'+id} className={page.split('/')[0]===id?'active':''} aria-current={page.split('/')[0]===id?'page':undefined}><Icon size={18}/>{label}{id==='runs'&&<span className="nav-pill">↗</span>}</a>)}</nav><section className="sidebar-note"><ShieldCheck size={23}/><h3>Every number. Accounted for.</h3><p>Independent reviews and a verifiable history behind every close.</p><a href="#audit">Explore audit trail <ExternalLink size={12}/></a></section><footer className="sidebar-footer"><span className="user-avatar">{role.slice(0,1).toUpperCase()}</span><span><strong>{role}</strong><small>Session-only credential</small></span><button aria-label="Sign out" title="Sign out" onClick={onSignOut}><LogOut size={17}/></button></footer></aside><section className="workspace-main"><header className="topbar"><p>Workspace <ChevronRight size={13}/> <strong>{links.find(([id])=>id===page.split('/')[0])?.[1]??'Reconciliation'}</strong></p><span className="environment"><span/>LIVE WORKSPACE</span></header><main id="main-content">{children}</main><footer className="app-footer"><span>Ledgerline · Financial operations, with clarity.</span><span>Amounts stored in exact minor units</span></footer></section></div>
+import type { ReactNode } from "react";
+import {
+  LayoutDashboard,
+  Landmark,
+  ArrowDownToLine,
+  ArrowLeftRight,
+  SlidersHorizontal,
+  GitCompareArrows,
+  ShieldCheck,
+  KeyRound,
+  LogOut,
+  ChevronRight,
+  ExternalLink,
+} from "lucide-react";
+const links = [
+  ["overview", "Overview", LayoutDashboard],
+  ["accounts", "Accounts", Landmark],
+  ["imports", "Statement imports", ArrowDownToLine],
+  ["transactions", "Transactions", ArrowLeftRight],
+  ["rules", "Matching rules", SlidersHorizontal],
+  ["runs", "Reconciliation", GitCompareArrows],
+  ["audit", "Audit trail", ShieldCheck],
+  ["keys", "Access & keys", KeyRound],
+] as const;
+export function Logo() {
+  return (
+    <span className="brand">
+      <span className="brand-mark">
+        ll
+        <span />
+      </span>
+      ledgerline<span className="brand-dot">.</span>
+    </span>
+  );
+}
+export function Shell({
+  page,
+  workspace,
+  role,
+  onSignOut,
+  children,
+}: {
+  page: string;
+  workspace: string;
+  role: string;
+  onSignOut: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="workspace-shell">
+      <aside className="sidebar">
+        <a className="brand-link" href="#overview">
+          <Logo />
+        </a>
+        <section className="workspace-switch">
+          <span className="workspace-avatar">
+            {workspace.slice(0, 2).toUpperCase()}
+          </span>
+          <span>
+            <strong>{workspace}</strong>
+            <small>Finance workspace</small>
+          </span>
+          <ChevronRight size={14} />
+        </section>
+        <p className="nav-label">WORKSPACE</p>
+        <nav aria-label="Workspace navigation">
+          {links.map(([id, label, Icon]) => (
+            <a
+              key={id}
+              href={"#" + id}
+              className={page.split("/")[0] === id ? "active" : ""}
+              aria-current={page.split("/")[0] === id ? "page" : undefined}
+            >
+              <Icon size={18} />
+              {label}
+              {id === "runs" && <span className="nav-pill">↗</span>}
+            </a>
+          ))}
+        </nav>
+        <section className="sidebar-note">
+          <ShieldCheck size={23} />
+          <h3>Every number. Accounted for.</h3>
+          <p>
+            Independent reviews and a verifiable history behind every close.
+          </p>
+          <a href="#audit">
+            Explore audit trail <ExternalLink size={12} />
+          </a>
+        </section>
+        <footer className="sidebar-footer">
+          <span className="user-avatar">{role.slice(0, 1).toUpperCase()}</span>
+          <span>
+            <strong>{role}</strong>
+            <small>Session-only credential</small>
+          </span>
+          <button aria-label="Sign out" title="Sign out" onClick={onSignOut}>
+            <LogOut size={17} />
+          </button>
+        </footer>
+      </aside>
+      <section className="workspace-main">
+        <header className="topbar">
+          <p>
+            Workspace <ChevronRight size={13} />{" "}
+            <strong>
+              {links.find(([id]) => id === page.split("/")[0])?.[1] ??
+                "Reconciliation"}
+            </strong>
+          </p>
+          <span className="environment">
+            <span />
+            LIVE WORKSPACE
+          </span>
+        </header>
+        <main id="main-content">{children}</main>
+        <footer className="app-footer">
+          <span>Ledgerline · Financial operations, with clarity.</span>
+          <span>Amounts stored in exact minor units</span>
+        </footer>
+      </section>
+    </div>
+  );
 }

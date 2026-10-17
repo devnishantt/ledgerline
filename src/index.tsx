@@ -1,2 +1,2 @@
-import { createApp } from './server/app'
-export default createApp()
+import { createApp } from "./server/app";
+export default createApp();

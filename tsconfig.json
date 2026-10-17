@@ -7,21 +7,9 @@
     "skipLibCheck": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "types": [
-      "@cloudflare/workers-types",
-      "bun",
-      "vite/client"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["@cloudflare/workers-types", "bun", "vite/client"],
     "allowImportingTsExtensions": true
   },
-  "include": [
-    "src",
-    "tests",
-    "vite*.ts"
-  ]
+  "include": ["src", "tests", "vite*.ts"]
 }
