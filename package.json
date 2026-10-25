@@ -7,12 +7,13 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build && vite build --config vite.worker.config.ts",
-    "typecheck": "tsc --noEmit",
-    "test": "bun test",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.e2e.json",
+    "test": "bun test ./tests",
     "check": "npm run typecheck && npm test && npm run build",
     "preview": "wrangler pages dev dist --ip 0.0.0.0 --port 3000",
     "db:migrate": "wrangler d1 migrations apply ledgerline --local",
-    "db:migrate:remote": "wrangler d1 migrations apply ledgerline --remote"
+    "db:migrate:remote": "wrangler d1 migrations apply ledgerline --remote",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.0",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261023.1",
     "@hono/vite-build": "^1.0.0",
+    "@playwright/test": "^1.64.1",
     "@types/bun": "latest",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
