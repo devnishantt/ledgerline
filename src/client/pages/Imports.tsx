@@ -134,6 +134,13 @@ export function Imports({ admin }: { admin: boolean }) {
                 <FileSpreadsheet size={16} />
                 Use illustrative USD sample
               </button>
+              <a
+                className="text-link"
+                href="/static/examples/statement-template.csv"
+                download
+              >
+                Download CSV template
+              </a>
               <small>1–200 rows · exact decimals · UTF-8 CSV</small>
             </section>
           </form>

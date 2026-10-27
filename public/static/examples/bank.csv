@@ -1,0 +1,5 @@
+date,amount,currency,description,reference,external_id
+2026-10-01,1250.00,USD,Invoice settlement,INV-1042,B-1042
+2026-10-02,-84.50,USD,Studio supplies,PO-882,B-882
+2026-10-03,640.03,USD,Customer payout,PAY-26,B-26
+2026-10-04,-12.00,USD,Account service fee,FEE-04,B-F04
