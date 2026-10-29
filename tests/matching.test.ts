@@ -146,3 +146,16 @@ test("produce stable proposals independent of input order", async () => {
     propose([...rows].reverse(), policy()),
   );
 });
+
+test("never reconcile opposite signs or zero against a nonzero settlement", () => {
+  const broad = policy({ tolerance: 10000, min_score: 40 });
+  expect(
+    scorePair(transaction({ amount: 100 }), ledger({ amount: -100 }), broad),
+  ).toBeNull();
+  expect(
+    scorePair(transaction({ amount: 0 }), ledger({ amount: 100 }), broad),
+  ).toBeNull();
+  expect(
+    scorePair(transaction({ amount: -100 }), ledger({ amount: -100 }), broad),
+  ).toMatchObject({ score: 100, variance: 0 });
+});

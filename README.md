@@ -21,7 +21,7 @@ A financial reconciliation workspace for bringing bank statements and ledger rec
 - Responsive React workspace with eight operational views, accessible form feedback, typed TanStack tables, and a rendering recovery boundary.
 - Exact integer minor-unit accounting, currency-specific precision, and reporting overflow guards. Different currencies are never combined into one balance.
 - Quoted UTF-8 CSV parsing, row-indexed validation, import previews, atomic imports, normalized fingerprints, and external-ID deduplication.
-- Rule-based one-to-one candidate scoring with explicit reasons, bounded settlement windows, and conservative ambiguity handling.
+- Rule-based one-to-one candidate scoring with same-sign enforcement, explicit reasons, bounded settlement windows, and conservative ambiguity handling.
 - Frozen statement/rule snapshots, independent review decisions, immutable finalized runs, and cross-run double-allocation protection.
 - Tenant-scoped API queries, admin/reviewer/viewer roles, expiring/revocable credentials, and protected administrator rotation.
 - Transactional revision claims, immutable source records, hash-linked audit events, chain verification, and missing-tail detection.
@@ -176,7 +176,7 @@ npm audit --omit=dev
 npm run check
 ```
 
-Verified locally: **152 passing domain/API regression tests**, strict application/tool typechecks, browser/edge builds, and a clean production dependency audit at the time of verification. Tests cover money precision, CSV edge cases, date boundaries, matching ambiguity, tenant isolation, key lifecycle, atomic rollback, concurrent reviews, stale revisions, immutable statements, audit corruption/missing tails, and body/origin/rate limits.
+Verified locally: **153 passing domain/API regression tests**, strict application/tool typechecks, browser/edge builds, and a clean production dependency audit at the time of verification. Tests cover money precision, CSV edge cases, date boundaries, matching ambiguity, tenant isolation, key lifecycle, atomic rollback, concurrent reviews, stale revisions, immutable statements, audit corruption/missing tails, and body/origin/rate limits.
 
 The full smoke workflow also passed against Wrangler's local D1 runtime—not only the test adapter:
 

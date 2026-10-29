@@ -11,7 +11,8 @@ export function scorePair(
     ledger.side !== "ledger" ||
     bank.account_id !== ledger.account_id ||
     bank.workspace_id !== ledger.workspace_id ||
-    bank.currency !== ledger.currency
+    bank.currency !== ledger.currency ||
+    Math.sign(bank.amount) !== Math.sign(ledger.amount)
   )
     return null;
   const variance = bank.amount - ledger.amount,
