@@ -1,5 +1,7 @@
 # Ledgerline
 
+[![CI](https://github.com/devnishantt/ledgerline/actions/workflows/ci.yml/badge.svg)](https://github.com/devnishantt/ledgerline/actions/workflows/ci.yml)
+
 A financial reconciliation workspace for bringing bank statements and ledger records into agreement—without silently signing off on differences.
 
 **React · TypeScript · TanStack Query & Table · Zod · Hono · Cloudflare D1**
@@ -26,7 +28,7 @@ A financial reconciliation workspace for bringing bank statements and ledger rec
 - Tenant-scoped API queries, admin/reviewer/viewer roles, expiring/revocable credentials, and protected administrator rotation.
 - Transactional revision claims, immutable source records, hash-linked audit events, chain verification, and missing-tail detection.
 - Persistent D1 request budgets, same-origin browser requests, bounded bodies, security headers, strict input schemas, and sanitized errors.
-- Downloadable CSV templates, explicitly illustrative sample records, an HTTP smoke workflow, regression tests, and an optional CI template.
+- Downloadable CSV templates, explicitly illustrative sample records, an HTTP smoke workflow, regression tests, and GitHub Actions CI.
 
 ## Repository and status
 
@@ -194,7 +196,7 @@ BOOTSTRAP_TOKEN="$(sed -n 's/^BOOTSTRAP_TOKEN=//p' .dev.vars)" npm run test:e2e
 
 Browser tests create disposable workspaces. Traces and automatic screenshots are disabled to avoid retaining credential-bearing views. An optional `LEDGERLINE_SCREENSHOT` path captures only the post-login illustrative overview.
 
-An inactive CI template at `ci/github-actions.yml` typechecks, runs coverage, builds both bundles, and audits production dependencies. This GitHub connection cannot write active workflow files. To enable it from an account with workflow permission, copy it into `.github/workflows/ci.yml` and commit that change. A successful local run does not claim a successful GitHub Actions run or remote production validation.
+GitHub Actions runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml) on pushes to `main`, pull requests, and manual dispatch. It typechecks the app and browser-test code, runs the Bun test suite with coverage, builds both bundles, and audits production dependencies. CI does not deploy anything or validate a production environment.
 
 ## Deployment status and next steps
 
